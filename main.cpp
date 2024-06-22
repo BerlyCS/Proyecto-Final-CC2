@@ -1,17 +1,7 @@
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -20,7 +10,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <execution>
 #include <fstream>
 #include <string>
 #include <iostream>
@@ -34,7 +23,7 @@ class mapa {
         Sprite wall;
         int block_size;
     public:
-        mapa(RenderWindow& window) {
+        mapa(int WIDTH, int HEIGHT) {
             grid = new char*[13];
             for (int i=0; i<13;i++) {
                 grid[i] = new char[13];
@@ -53,8 +42,8 @@ class mapa {
                     grid[i][j] = '#';
                 }
             }
-            int x = window.getSize().x;
-            int y = window.getSize().y;
+            int x = WIDTH;
+            int y = HEIGHT;
             int max = x<y ? y : x;
             block_size = max/13;
             Texture wall_img;
@@ -77,6 +66,7 @@ class mapa {
             for (int i=0; i<13; i++) {
                 for (int j=0; j<13; j++) {
                     window.draw(wall);
+
                 }
             }
         }
@@ -84,13 +74,13 @@ class mapa {
 };
 
 int main() {
-    mapa map;
-    map.print_layout();
 
     RenderWindow window(VideoMode::getFullscreenModes()[0], "Bouncing balls", Style::Fullscreen);
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
-    const int HEIGTH = window.getSize().y;
+    const int HEIGHT = window.getSize().y;
+    mapa map(WIDTH, HEIGHT);
+    map.print_layout();
 
     /* Font font; */
     /* if (!font.loadFromFile("pixelated.ttf")) { */
@@ -106,7 +96,9 @@ int main() {
                 window.close();            
             
         }
+        window.clear(Color::Cyan);
         map.draw(window);
+        window.display();
         //logica aqui
     }
     return EXIT_SUCCESS;
