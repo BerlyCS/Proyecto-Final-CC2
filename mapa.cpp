@@ -1,4 +1,8 @@
+#pragma once
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <iostream>
+#include "bomb.cpp"
 
 using namespace sf;
 class mapa {
@@ -7,6 +11,7 @@ class mapa {
         Sprite wall;
         int block_size;
         Texture wall_img;
+        std::vector<Bomba*> list;
     public:
         mapa(int WIDTH, int HEIGHT) {
             grid = new char*[13];
@@ -41,13 +46,18 @@ class mapa {
         void print_layout() const {
             for (int i=0; i<13; i++) {
                 for (int j=0; j<13; j++) {
-                    /* cout<<grid[i][j]<< ' '; */
+                    cout<<grid[i][j]<< ' ';
                 }
-                /* cout<<endl; */
+                cout<<endl;
             }
         }
+
+        void add_bomb(int power, int type, int x, int y) {
+
+        }
         
-        void draw(RenderWindow& window) {
+        //el mapa actualizara, funcionara como observer de los eventos que destruyen las paredes
+        void update_map(RenderWindow& window) {
             window.draw(wall);
                     
         }

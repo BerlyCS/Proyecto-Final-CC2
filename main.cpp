@@ -10,78 +10,79 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Audio.hpp>
-#include <cmath>
 #include <cstdlib>
-#include <ctime>
-#include <fstream>
 #include <string>
-#include <iostream>
 #include "mapa.cpp"
+#include "bomb.cpp"
 
 using namespace sf;
 using namespace std;
 
-class player {
+class Player {
     protected:
         Texture images[4];
         Sprite sprite;
-        double x,y, speed;
-        int bombcount;
+        double x, y, speed;
+        int bombcount, fire_upgrade;
+        friend class powerup;
     public:
-        player() {
-            speed = 1.0f;
+        Player() {
+            speed = 5.0f;
             bombcount = 1;
+            fire_upgrade = 3;
         }
 
-        void manejarEvento(const sf::Event& evento)
-        {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            {
-                sprite.move(0, -5.0f);
-                sprite.setTexture(images[0]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            {
-                sprite.move(0, 5.0f);
-                sprite.setTexture(images[2]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            {
-                sprite.move(-5.0f, 0);
-                sprite.setTexture(images[1]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            {
-                sprite.move(5.0f, 0);
-                sprite.setTexture(images[3]);
-            }
-        }
+        //para poder cambiar los controles
+        virtual void manejarEvento() = 0;
         void draw(RenderWindow& win) {
             win.draw(sprite);
         }
 
 };
 
-class player_one : public player {
+class Player_one : public Player {
     public:
-        player_one() : player() {
+        Player_one() : Player() {
             sprite.setPosition(Vector2f(100,100));
             images[0].loadFromFile("images/Character_W_4.png");
             images[1].loadFromFile("images/Character_A_4.png");
             images[2].loadFromFile("images/Character_S_4.png");
             images[3].loadFromFile("images/Character_D_4.png");
         }
+        void manejarEvento()
+       {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            {
+                sprite.move(0, -speed);
+                sprite.setTexture(images[0]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {
+                sprite.move(0, speed);
+                sprite.setTexture(images[2]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            {
+                sprite.move(-speed, 0);
+                sprite.setTexture(images[1]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                sprite.move(speed, 0);
+                sprite.setTexture(images[3]);
+            }
+        }
 };
 
 int main() {
 
-    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bouncing balls", Style::Fullscreen);
+    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
     mapa map(WIDTH, HEIGHT);
     map.print_layout();
-    player_one player;
+    Player_one player;
 
     /* Font font; */
     /* if (!font.loadFromFile("pixelated.ttf")) { */
@@ -93,12 +94,12 @@ int main() {
         Event event;
         //Eventos
         while (window.pollEvent(event)) {
-            player.manejarEvento(event);
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();            
             
         }
-        window.clear(Color::Cyan);
+        player.manejarEvento();
+        window.clear(Color::Black);
         player.draw(window);
         /* map.draw(window); */
         window.display();
