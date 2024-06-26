@@ -10,79 +10,80 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Audio.hpp>
+#include <cmath>
 #include <cstdlib>
+#include <ctime>
+#include <fstream>
 #include <string>
+#include <iostream>
 #include "mapa.cpp"
-#include "bomb.cpp"
 
 using namespace sf;
 using namespace std;
 
-class Player {
+class player {
     protected:
         Texture images[4];
         Sprite sprite;
-        double x, y, speed;
-        int bombcount, fire_upgrade;
-        friend class powerup;
+        double x,y, speed;
+        int bombcount;
     public:
-        Player() {
-            speed = 5.0f;
+        player() {
+            speed = 1.0f;
             bombcount = 1;
-            fire_upgrade = 3;
         }
 
-        //para poder cambiar los controles
-        virtual void manejarEvento() = 0;
+        void manejarEvento(const sf::Event& evento)
+        {
+            if (evento.type == sf::Event::KeyPressed)
+            {
+                if (evento.key.code == sf::Keyboard::Up)
+                {
+                    sprite.move(0, -5.0f);
+                    sprite.setTexture(images[0]);
+                }
+                else if (evento.key.code == sf::Keyboard::Down)
+                {
+                    sprite.move(0, 5.0f);
+                    sprite.setTexture(images[2]);                }
+                else if (evento.key.code == sf::Keyboard::Left)
+                {
+                    sprite.move(-5.0f, 0);
+                    sprite.setTexture(images[1]);                }
+                else if (evento.key.code == sf::Keyboard::Right)
+                {
+                    sprite.move(5.0f, 0);
+                    sprite.setTexture(images[3]);                }
+            }
+        }
         void draw(RenderWindow& win) {
             win.draw(sprite);
         }
 
 };
 
-class Player_one : public Player {
+class player_one : public player {
     public:
-        Player_one() : Player() {
+        player_one() : player() {
             sprite.setPosition(Vector2f(100,100));
             images[0].loadFromFile("images/Character_W_4.png");
             images[1].loadFromFile("images/Character_A_4.png");
             images[2].loadFromFile("images/Character_S_4.png");
             images[3].loadFromFile("images/Character_D_4.png");
         }
-        void manejarEvento()
-       {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            {
-                sprite.move(0, -speed);
-                sprite.setTexture(images[0]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            {
-                sprite.move(0, speed);
-                sprite.setTexture(images[2]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            {
-                sprite.move(-speed, 0);
-                sprite.setTexture(images[1]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            {
-                sprite.move(speed, 0);
-                sprite.setTexture(images[3]);
-            }
-        }
 };
 
 int main() {
 
-    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
+    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bouncing balls", Style::Fullscreen);
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    mapa map(WIDTH, HEIGHT);
-    map.print_layout();
-    Player_one player;
+    //mapa map(WIDTH, HEIGHT);
+    Mapa_2 mapa(WIDTH, HEIGHT);
+    
+    //map.print_layout();
+    player_one player;
 
     /* Font font; */
     /* if (!font.loadFromFile("pixelated.ttf")) { */
@@ -92,16 +93,17 @@ int main() {
 
     while (window.isOpen()) {
         Event event;
+        
         //Eventos
         while (window.pollEvent(event)) {
+            player.manejarEvento(event);
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();            
             
         }
-        player.manejarEvento();
-        window.clear(Color::Black);
+        mapa.draw(window);
         player.draw(window);
-        /* map.draw(window); */
+        //window.clear(Color::Black);
         window.display();
         //logica aqui
     }
