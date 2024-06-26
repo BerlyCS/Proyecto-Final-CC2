@@ -18,7 +18,8 @@
 #include <iostream>
 #include "mapa.cpp"
 
-//si encuentran un mejor algoritmo pueden borrarlo
+//si encuentran una mejor implementacion pueden aplicarlo sobre lo
+//que ya esta
 
 using namespace sf;
 using namespace std;
@@ -99,12 +100,12 @@ class player_one : public Player {
     public:
         player_one() : Player() {
             sprite.setPosition(Vector2f(100,100));
-            if (
+            if (!(
                 images[0].loadFromFile("images/Character_W_4.png") &&
                 images[1].loadFromFile("images/Character_A_4.png") &&
                 images[2].loadFromFile("images/Character_S_4.png") &&
                 images[3].loadFromFile("images/Character_D_4.png") 
-               ) {
+               )) {
                 cout<<"No se pudo cargar las texturas del jugador"<<endl;
             }
         }
@@ -133,6 +134,44 @@ class player_one : public Player {
         }
 };
 
+class Player_two : public Player {
+    public:
+        Player_two() : Player() {
+            sprite.setPosition(Vector2f(100,100));
+            if (
+                images[0].loadFromFile("images/Character_W_4.png") &&
+                images[1].loadFromFile("images/Character_A_4.png") &&
+                images[2].loadFromFile("images/Character_S_4.png") &&
+                images[3].loadFromFile("images/Character_D_4.png") 
+               ) {
+                cout<<"No se pudo cargar las texturas del jugador"<<endl;
+            }
+        }
+        void controlar()
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+            {
+                sprite.move(0, -speed);
+                sprite.setTexture(images[0]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            {
+                sprite.move(0, speed);
+                sprite.setTexture(images[2]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            {
+                sprite.move(-speed, 0);
+                sprite.setTexture(images[1]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            {
+                sprite.move(speed, 0);
+                sprite.setTexture(images[3]);
+            }
+        }
+};
+
 int main() {
     RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
     window.setVerticalSyncEnabled(true);
@@ -140,9 +179,11 @@ int main() {
     const int HEIGHT = window.getSize().y;
     //mapa map(WIDTH, HEIGHT);
     Mapa_2 mapa(WIDTH, HEIGHT);
-    
+    mapa.Print();
+
     //map.print_layout();
     player_one player;
+    Player_two player_dos;
 
     while (window.isOpen()) {
         Event event;
@@ -153,11 +194,12 @@ int main() {
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
-        mapa.draw(window);
-        player.controlar();
         window.clear(Color::Black);
+        player.controlar();
+        player_dos.controlar();
+        mapa.draw(window);
         player.draw(window);
-        //window.clear(Color::Black);
+        player_dos.draw(window);
         window.display();
         //logica aqui
     }
