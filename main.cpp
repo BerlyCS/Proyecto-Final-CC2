@@ -18,18 +18,49 @@
 #include <iostream>
 #include "mapa.cpp"
 
+//si encuentran un mejor algoritmo pueden borrarlo
+
 using namespace sf;
 using namespace std;
 
-class player {
+class Bomba {
+    private:
+        int power;
+        Texture images[3];
+        Sprite sprite;
+        int type;
+        Time time_placed;
+        double x,y;
+        friend class mapa;
+    public:
+        Bomba(int power, int type, double x, double y, Time time ) : x(x), y(y) {
+            this->power = power;
+            this->type = type;
+            images[0].loadFromFile("images/bomb3.png");
+            sprite.setTexture(images[0]);
+            time_placed = time;
+        }
+
+        void draw(RenderWindow& window, Time actual_time) {
+            Time seconds_passed = actual_time - time_placed;
+            if (seconds_passed.asMilliseconds() > 3000 ) {
+                
+            } else {
+                window.draw(sprite);
+                return;
+            }
+        }
+};
+
+class Player {
     protected:
         Texture images[4];
         Sprite sprite;
         double x,y, speed;
         int bombcount;
     public:
-        player() {
-            speed = 1.0f;
+        Player(){
+            speed = 5.0f;
             bombcount = 1;
         }
 
@@ -56,26 +87,54 @@ class player {
                     sprite.setTexture(images[3]);                }
             }
         }
+        //para poder cambiar los controles
+        virtual void controlar() = 0;
         void draw(RenderWindow& win) {
             win.draw(sprite);
         }
 
 };
 
-class player_one : public player {
+class player_one : public Player {
     public:
-        player_one() : player() {
+        player_one() : Player() {
             sprite.setPosition(Vector2f(100,100));
-            images[0].loadFromFile("images/Character_W_4.png");
-            images[1].loadFromFile("images/Character_A_4.png");
-            images[2].loadFromFile("images/Character_S_4.png");
-            images[3].loadFromFile("images/Character_D_4.png");
+            if (
+                images[0].loadFromFile("images/Character_W_4.png") &&
+                images[1].loadFromFile("images/Character_A_4.png") &&
+                images[2].loadFromFile("images/Character_S_4.png") &&
+                images[3].loadFromFile("images/Character_D_4.png") 
+               ) {
+                cout<<"No se pudo cargar las texturas del jugador"<<endl;
+            }
+        }
+        void controlar()
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            {
+                sprite.move(0, -speed);
+                sprite.setTexture(images[0]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {
+                sprite.move(0, speed);
+                sprite.setTexture(images[2]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            {
+                sprite.move(-speed, 0);
+                sprite.setTexture(images[1]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                sprite.move(speed, 0);
+                sprite.setTexture(images[3]);
+            }
         }
 };
 
 int main() {
-
-    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bouncing balls", Style::Fullscreen);
+    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
@@ -85,12 +144,6 @@ int main() {
     //map.print_layout();
     player_one player;
 
-    /* Font font; */
-    /* if (!font.loadFromFile("pixelated.ttf")) { */
-
-    /*     return EXIT_FAILURE; */
-    /* } */
-
     while (window.isOpen()) {
         Event event;
         
@@ -98,10 +151,11 @@ int main() {
         while (window.pollEvent(event)) {
             player.manejarEvento(event);
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
-                window.close();            
-            
+                window.close();
         }
         mapa.draw(window);
+        player.controlar();
+        window.clear(Color::Black);
         player.draw(window);
         //window.clear(Color::Black);
         window.display();
