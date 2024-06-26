@@ -1,29 +1,34 @@
-#pragma once
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Clock.hpp>
+#include <SFML/System/Time.hpp>
+#include <ctime>
 
-class Bomba {
-    private:
-        int power;
-        sf::Texture images[3];
-        sf::Sprite sprite;
-        int type;
-        sf::Clock clock;
-        double x,y;
-        void explode() {
-            
-        }
-    public:
-        Bomba(int power, int type, double x, double y) : x(x), y(y) {
-            this->power = power;
-            this->type = type;
-            images[0].loadFromFile("images/bomb3.png");
+using namespace sf;
+
+
+
+int main() {
+    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
+    window.setVerticalSyncEnabled(true);
+    const int WIDTH = window.getSize().x;
+    const int HEIGHT = window.getSize().y;
+    Clock clock;
+    Bomba bomb(3,1,300,300, clock.getElapsedTime());
+
+    while (window.isOpen()) {
+        Event event;
+        //Eventos
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
+                window.close(); 
         }
 
-        void tick() {
-            if (clock.getElapsedTime().asSeconds() > 3) {
-                delete this;
-            }
-        }
-};
+
+        bomb.draw(window, clock.getElapsedTime());
+        window.display();
+        //logica aqui
+    }
+    return EXIT_SUCCESS;
+}
