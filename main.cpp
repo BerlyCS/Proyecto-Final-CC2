@@ -35,25 +35,25 @@ class player {
 
         void manejarEvento(const sf::Event& evento)
         {
-            if (evento.type == sf::Event::KeyPressed)
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
             {
-                if (evento.key.code == sf::Keyboard::Up)
-                {
-                    sprite.move(0, -5.0f);
-                    sprite.setTexture(images[0]);
-                }
-                else if (evento.key.code == sf::Keyboard::Down)
-                {
-                    sprite.move(0, 5.0f);
-                    sprite.setTexture(images[2]);                }
-                else if (evento.key.code == sf::Keyboard::Left)
-                {
-                    sprite.move(-5.0f, 0);
-                    sprite.setTexture(images[1]);                }
-                else if (evento.key.code == sf::Keyboard::Right)
-                {
-                    sprite.move(5.0f, 0);
-                    sprite.setTexture(images[3]);                }
+                sprite.move(0, -5.0f);
+                sprite.setTexture(images[0]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {
+                sprite.move(0, 5.0f);
+                sprite.setTexture(images[2]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            {
+                sprite.move(-5.0f, 0);
+                sprite.setTexture(images[1]);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                sprite.move(5.0f, 0);
+                sprite.setTexture(images[3]);
             }
         }
         void draw(RenderWindow& win) {
