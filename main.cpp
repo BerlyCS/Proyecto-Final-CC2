@@ -45,15 +45,15 @@ class player {
                 else if (evento.key.code == sf::Keyboard::Down)
                 {
                     sprite.move(0, 5.0f);
-                    sprite.setTexture(images[3]);                }
+                    sprite.setTexture(images[2]);                }
                 else if (evento.key.code == sf::Keyboard::Left)
                 {
                     sprite.move(-5.0f, 0);
-                    sprite.setTexture(images[2]);                }
+                    sprite.setTexture(images[1]);                }
                 else if (evento.key.code == sf::Keyboard::Right)
                 {
                     sprite.move(5.0f, 0);
-                    sprite.setTexture(images[1]);                }
+                    sprite.setTexture(images[3]);                }
             }
         }
         void draw(RenderWindow& win) {
