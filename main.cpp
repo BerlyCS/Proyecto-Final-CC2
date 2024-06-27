@@ -54,6 +54,11 @@ class Bomba {
                 return;
             }
         }
+        void putBomb(Vector2i ){
+          if(){
+
+          }
+        }
 };
 
 class Player {
