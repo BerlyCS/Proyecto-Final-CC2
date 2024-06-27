@@ -121,7 +121,7 @@ public:
                 }
                 auto size = sprite.getTexture()->getSize();
                 sprite.setScale(sizeBlock/size.x, sizeBlock/size.y);
-                sprite.setPosition(sizeBlock * i, sizeBlock * j);
+                sprite.setPosition(sizeBlock * j, sizeBlock * i);
                 filaSprites.push_back(sprite);
             }
             sprites_map.push_back(filaSprites);
@@ -129,7 +129,7 @@ public:
     }
 
     void generarMatriz() {
-        srand(3);
+        srand(time(NULL));
         for (int j = 0; j < 13; j++) {
             for (int k = 0; k < 13; k++) {
                 if (j == 0 || k == 0 || j == 12 || k == 12) {
@@ -138,7 +138,11 @@ public:
                     if (j % 2 == 0 && k % 2 == 0) {
                         matriz[j][k] = '#';  // Asignar '#' a la matriz en posiciones pares
                     } else {
-                        int aux = rand() % 5;
+                        if((j<=2 && k<=2) || (j>=10 && k>=10)){
+                            matriz[j][k] = ' ';
+                            continue;
+                        }
+                        int aux = rand() % 6;
                         if (aux == 0) {
                             matriz[j][k] = ' ';
                         } else {
