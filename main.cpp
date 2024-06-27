@@ -65,37 +65,12 @@ class Player {
             bombcount = 1;
         }
 
-        void manejarEvento(const sf::Event& evento)
-        {
-            if (evento.type == sf::Event::KeyPressed)
-            {
-                if (evento.key.code == sf::Keyboard::Up)
-                {
-                    sprite.move(0, -5.0f);
-                    sprite.setTexture(images[0]);
-                }
-                else if (evento.key.code == sf::Keyboard::Down)
-                {
-                    sprite.move(0, 5.0f);
-                    sprite.setTexture(images[2]);                }
-                else if (evento.key.code == sf::Keyboard::Left)
-                {
-                    sprite.move(-5.0f, 0);
-                    sprite.setTexture(images[1]);                }
-                else if (evento.key.code == sf::Keyboard::Right)
-                {
-                    sprite.move(5.0f, 0);
-                    sprite.setTexture(images[3]);                }
-            }
-            
-            std::cout<<sprite.getGlobalBounds().getPosition().x<<std::endl;
-        }
         //para poder cambiar los controles
         virtual void controlar() = 0;
         void draw(RenderWindow& win) {
             win.draw(sprite);
         }
-
+/*
         void validadMovimiento(vector<vector<char>> matriz){
             int ejex, ejey = 0;
             int num = 1000/13;
@@ -111,7 +86,14 @@ class Player {
 
             ejey += num;
         }
+*/
 
+        void colider(RenderWindow& win){
+            RectangleShape colider(Vector2f(55, 55));
+            colider.setPosition(Vector2f(sprite.getGlobalBounds().getPosition().x, sprite.getGlobalBounds().getPosition().y+30));
+            colider.setFillColor(Color::Yellow);
+            win.draw(colider);
+        }
 };
 
 class player_one : public Player {
@@ -209,8 +191,7 @@ int main() {
         
         //Eventos
         while (window.pollEvent(event)) {
-            player.manejarEvento(event);
-            player.validadMovimiento(mapa.getMatriz());
+            //player.validadMovimiento(mapa.getMatriz());
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
@@ -220,6 +201,7 @@ int main() {
         mapa.draw(window);
         player.draw(window);
         player_dos.draw(window);
+        player.colider(window);
         window.display();
         //logica aqui
     }
