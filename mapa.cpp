@@ -170,4 +170,8 @@ public:
             }
         }
     }
+
+    vector<vector<char>> getMatriz(){
+        return matriz;
+    }
 };

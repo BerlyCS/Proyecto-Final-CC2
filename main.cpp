@@ -87,11 +87,29 @@ class Player {
                     sprite.move(5.0f, 0);
                     sprite.setTexture(images[3]);                }
             }
+            
+            std::cout<<sprite.getGlobalBounds().getPosition().x<<std::endl;
         }
         //para poder cambiar los controles
         virtual void controlar() = 0;
         void draw(RenderWindow& win) {
             win.draw(sprite);
+        }
+
+        void validadMovimiento(vector<vector<char>> matriz){
+            int ejex, ejey = 0;
+            int num = 1000/13;
+            for(int i=0; i<13; i++){
+                ejex = 0;
+                for(int j=0; j<13; j++){
+                    if(matriz[i][j] == '#'){
+                        if (sprite.getGlobalBounds().getPosition().x > ejex) sprite.move(-0.9f,0);
+                    }
+                }
+                ejex += num;
+            }
+
+            ejey += num;
         }
 
 };
@@ -173,7 +191,8 @@ class Player_two : public Player {
 };
 
 int main() {
-    RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
+    //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Bomberman");
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
@@ -191,6 +210,7 @@ int main() {
         //Eventos
         while (window.pollEvent(event)) {
             player.manejarEvento(event);
+            player.validadMovimiento(mapa.getMatriz());
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
