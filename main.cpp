@@ -99,9 +99,9 @@ class Player {
 
 };
 
-class player_one : public Player {
+class Player_one : public Player {
     public:
-        player_one() : Player() {
+        Player_one() : Player() {
             sprite.setPosition(Vector2f(100,100));
             if (!(
                 images[0].loadFromFile("images/Character_W_4.png") &&
@@ -183,18 +183,16 @@ int main() {
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    //mapa map(WIDTH, HEIGHT);
     Mapa_2 mapa(WIDTH, HEIGHT);
     mapa.Print();
 
-    //map.print_layout();
-    player_one player;
+    Player_one player;
     Player_two player_dos;
 
     while (window.isOpen()) {
         Event event;
         
-        //Eventos
+        //eventos
         while (window.pollEvent(event)) {
             player.manejarEvento(event);
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))

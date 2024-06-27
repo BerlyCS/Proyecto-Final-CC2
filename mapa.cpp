@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <vector>
-#include <iostream>
 #include <iostream>
 #include <ctime>
 #include <vector>
@@ -10,78 +11,27 @@
 using namespace sf;
 using namespace std;
 
-class mapa {
-    private:
-        char** grid;
-        Sprite wall;
+class block {
+    protected:
         int block_size;
-        Texture wall_img;
-    public:
-        mapa(int WIDTH, int HEIGHT) {
-            grid = new char*[13];
-            for (int i=0; i<13;i++) {
-                grid[i] = new char[13];
-                for (int j=0; j<13; j++)
-                    grid[i][j] = ' ';
-            }
-
-            for (int i = 0; i < 13; i++) {
-                grid[i][0] = '#';
-                grid[0][i] = '#';
-                grid[12][i] = '#';
-                grid[i][12] = '#';
-            }
-            for (int i = 2; i < 11; i += 2) {
-                for (int j = 2; j < 11; j += 2) {
-                    grid[i][j] = '#';
-                }
-            }
-
-            int x = WIDTH;
-            int y = HEIGHT;
-            int max = x < y ? y : x;
-            block_size = max / 13;
-            
-            if (!wall_img.loadFromFile("images/wall.png")) {
-                std::cerr << "Error cargando la textura: images/wall.png" << std::endl;
-                // Manejar el error apropiadamente, por ejemplo, cargar una textura alternativa
-            }
-
-            wall.setTexture(wall_img);
-            auto size = wall.getTexture()->getSize();
-            wall.scale(float(block_size) / size.x, float(block_size) / size.y);
-            wall.setPosition(Vector2f(210, 3));
+        Sprite sprite;
+        Sprite& getSprite() {
+            return sprite;
         }
+        void setTexture(Texture texture) {
+            sprite.setTexture(texture);
+        }
+};
 
-        ~mapa() {
-            for (int i = 0; i < 13; ++i) {
-                delete[] grid[i];
-            }
-            delete[] grid;
-        }
+class wall : public block {
 
-        void print_layout() const {
-            for (int i=0; i<13; i++) {
-                for (int j=0; j<13; j++) {
-                    cout<<grid[i][j]<< ' ';
-                }
-                cout<<endl;
-            }
-        }
+};
 
-        void add_bomb(int power, int type, int x, int y) {
+class weak_wall : public block {
 
-        }
-        
-        //el mapa actualizara, funcionara como observer de los eventos que destruyen las paredes
-        void update_map(RenderWindow& window) {
-            window.draw(wall);
-                    
-        }
-        
-        void draw(RenderWindow& window) {
-            window.draw(wall);
-        }
+};
+class tile : public block {
+
 };
 
 class Mapa_2 {
