@@ -68,29 +68,6 @@ class Player {
             bombcount = 1;
         }
 
-        void manejarEvento(const sf::Event& evento)
-        {
-            if (evento.type == sf::Event::KeyPressed)
-            {
-                if (evento.key.code == sf::Keyboard::Up)
-                {
-                    sprite.move(0, -5.0f);
-                    sprite.setTexture(images[0]);
-                }
-                else if (evento.key.code == sf::Keyboard::Down)
-                {
-                    sprite.move(0, 5.0f);
-                    sprite.setTexture(images[2]);                }
-                else if (evento.key.code == sf::Keyboard::Left)
-                {
-                    sprite.move(-5.0f, 0);
-                    sprite.setTexture(images[1]);                }
-                else if (evento.key.code == sf::Keyboard::Right)
-                {
-                    sprite.move(5.0f, 0);
-                    sprite.setTexture(images[3]);                }
-            }
-        }
         //para poder cambiar los controles
         virtual void controlar() = 0;
         void draw(RenderWindow& win) {
@@ -194,7 +171,6 @@ int main() {
         
         //eventos
         while (window.pollEvent(event)) {
-            player.manejarEvento(event);
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
