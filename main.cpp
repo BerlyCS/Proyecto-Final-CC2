@@ -24,6 +24,10 @@
 using namespace sf;
 using namespace std;
 
+void place_bomb(Vector2i coords) {
+
+}
+
 class Bomba {
     private:
         int power;
@@ -32,7 +36,6 @@ class Bomba {
         int type;
         Time time_placed;
         double x,y;
-        friend class mapa;
     public:
         Bomba(int power, int type, double x, double y, Time time ) : x(x), y(y) {
             this->power = power;
@@ -106,7 +109,7 @@ class player_one : public Player {
                 images[2].loadFromFile("images/Character_S_4.png") &&
                 images[3].loadFromFile("images/Character_D_4.png") 
                )) {
-                cout<<"No se pudo cargar las texturas del jugador"<<endl;
+                cout<<"No se pudo cargar las texturas del jugador 1"<<endl;
             }
         }
         void controlar()
@@ -131,6 +134,9 @@ class player_one : public Player {
                 sprite.move(speed, 0);
                 sprite.setTexture(images[3]);
             }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+                place_bomb(Vector2i(x,y));
+            }
         }
 };
 
@@ -138,13 +144,13 @@ class Player_two : public Player {
     public:
         Player_two() : Player() {
             sprite.setPosition(Vector2f(100,100));
-            if (
+            if (!(
                 images[0].loadFromFile("images/Character_W_4.png") &&
                 images[1].loadFromFile("images/Character_A_4.png") &&
                 images[2].loadFromFile("images/Character_S_4.png") &&
                 images[3].loadFromFile("images/Character_D_4.png") 
-               ) {
-                cout<<"No se pudo cargar las texturas del jugador"<<endl;
+               )) {
+                cout<<"No se pudo cargar las texturas del jugador 2"<<endl;
             }
         }
         void controlar()

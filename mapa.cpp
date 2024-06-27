@@ -94,9 +94,9 @@ private:
 
 public:
     Mapa_2(int WIDTH, int HEIGHT) {
-        wallTexture.loadFromFile("images/wall_1.png");
-        weakWall.loadFromFile("images/weak_wall_1.png");
-        tileText.loadFromFile("images/tile_1.png");
+        wallTexture.loadFromFile("images/wall_4.png");
+        weakWall.loadFromFile("images/weak_wall_4.png");
+        tileText.loadFromFile("images/tile_4.png");
 
         int x = WIDTH;
         int y = HEIGHT;
