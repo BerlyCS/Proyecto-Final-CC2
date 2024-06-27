@@ -10,77 +10,53 @@
 using namespace sf;
 using namespace std;
 
-class mapa {
-    private:
-        char** grid;
-        Sprite wall;
-        int block_size;
-        Texture wall_img;
+class Block{
+    protected:
+        Texture texture;
+        Sprite sprite;
+        float sizeBlock;
     public:
-        mapa(int WIDTH, int HEIGHT) {
-            grid = new char*[13];
-            for (int i=0; i<13;i++) {
-                grid[i] = new char[13];
-                for (int j=0; j<13; j++)
-                    grid[i][j] = ' ';
-            }
-
-            for (int i = 0; i < 13; i++) {
-                grid[i][0] = '#';
-                grid[0][i] = '#';
-                grid[12][i] = '#';
-                grid[i][12] = '#';
-            }
-            for (int i = 2; i < 11; i += 2) {
-                for (int j = 2; j < 11; j += 2) {
-                    grid[i][j] = '#';
-                }
-            }
-
+        Block(int WIDTH, int HEIGHT){
             int x = WIDTH;
             int y = HEIGHT;
-            int max = x < y ? y : x;
-            block_size = max / 13;
-            
-            if (!wall_img.loadFromFile("images/wall.png")) {
-                std::cerr << "Error cargando la textura: images/wall.png" << std::endl;
-                // Manejar el error apropiadamente, por ejemplo, cargar una textura alternativa
-            }
-
-            wall.setTexture(wall_img);
-            auto size = wall.getTexture()->getSize();
-            wall.scale(float(block_size) / size.x, float(block_size) / size.y);
-            wall.setPosition(Vector2f(210, 3));
+            int min = x > y ? y : x;
+            sizeBlock = (float(min) / 13);
         }
 
-        ~mapa() {
-            for (int i = 0; i < 13; ++i) {
-                delete[] grid[i];
-            }
-            delete[] grid;
+        Texture& getTexture(){
+            return texture;
         }
 
-        void print_layout() const {
-            for (int i=0; i<13; i++) {
-                for (int j=0; j<13; j++) {
-                    cout<<grid[i][j]<< ' ';
-                }
-                cout<<endl;
-            }
+        Sprite& getSprite(){
+            return sprite;
         }
 
-        void add_bomb(int power, int type, int x, int y) {
+        void draw(RenderWindow& window){
+            window.draw(sprite);
+        }
+};
 
+class Wall : public Block{
+    public:
+        Wall(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
+            texture.loadFromFile("images/wall_1.png");
+            sprite.setTexture(texture);
         }
-        
-        //el mapa actualizara, funcionara como observer de los eventos que destruyen las paredes
-        void update_map(RenderWindow& window) {
-            window.draw(wall);
-                    
+};
+
+class WeakWall : public Block{
+    public:
+        WeakWall(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
+            texture.loadFromFile("images/weak_wall_1.png");
+            sprite.setTexture(texture);
         }
-        
-        void draw(RenderWindow& window) {
-            window.draw(wall);
+};
+
+class Tile : public Block{
+    public:
+        Tile(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
+            texture.loadFromFile("images/tile_1.png");
+            sprite.setTexture(texture);
         }
 };
 
@@ -89,7 +65,7 @@ private:
     Texture wallTexture;
     Texture weakWall, tileText;
     float sizeBlock;
-    vector< vector<Sprite>> sprites_map;
+    vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
 
 public:
@@ -108,21 +84,24 @@ public:
         generarMatriz();
         // Inicializar sprites_map y matriz
         for (int i = 0; i < 13; i++) {
-            vector<Sprite> filaSprites;
+            vector<Block*> filaSprites;
             for (int j = 0; j < 13; j++) {
-                Sprite sprite;
-
+                //Sprite sprite;
+                Block* bloque;
                 if (matriz[i][j] == '#') {
-                    sprite.setTexture(wallTexture);
+                    bloque = new Wall(WIDTH, HEIGHT);
+                    //sprite.setTexture(wallTexture);
                 } else if (matriz[i][j] == 'x') {
-                    sprite.setTexture(weakWall);
+                    bloque = new WeakWall(WIDTH, HEIGHT);
+                    //sprite.setTexture(weakWall);
                 } else {
-                    sprite.setTexture(tileText);
+                    bloque = new Tile(WIDTH, HEIGHT);
+                    //sprite.setTexture(tileText);
                 }
-                auto size = sprite.getTexture()->getSize();
-                sprite.setScale(sizeBlock/size.x, sizeBlock/size.y);
-                sprite.setPosition(sizeBlock * j, sizeBlock * i);
-                filaSprites.push_back(sprite);
+                auto size = bloque->getTexture().getSize();
+                bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
+                bloque->getSprite().setPosition(sizeBlock * j, sizeBlock * i);
+                filaSprites.push_back(bloque);
             }
             sprites_map.push_back(filaSprites);
         }
@@ -166,7 +145,7 @@ public:
     void draw(RenderWindow& window) {
         for (int i = 0; i < 13; i++) {
             for (int j = 0; j < 13; j++) {
-                window.draw(sprites_map[i][j]);
+                sprites_map[i][j]->draw(window);
             }
         }
     }
