@@ -57,16 +57,34 @@ class Player {
     protected:
         Texture images[4];
         Sprite sprite;
-        double x,y, speed;
+        double speed;
+        Vector2f psi, pid;
         int bombcount;
+        int posMx, posMy;
     public:
         Player(){
             speed = 5.0f;
             bombcount = 1;
         }
+//Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
+        void colider(RenderWindow& win){
+            psi = Vector2f(sprite.getGlobalBounds().getPosition().x, sprite.getGlobalBounds().getPosition().y+30);
+            pid = Vector2f(sprite.getGlobalBounds().getPosition().x+55, sprite.getGlobalBounds().getPosition().y+85);
+
+            RectangleShape psid (Vector2f(5, 5));
+            psid.setPosition(psi);
+            psid.setFillColor(Color::Red);
+
+            RectangleShape pidd (Vector2f(5, 5));
+            pidd.setPosition(pid);
+            pidd.setFillColor(Color::Red);
+
+            win.draw(pidd);
+            win.draw(psid);
+        }
 
         //para poder cambiar los controles
-        virtual void controlar() = 0;
+        virtual void controlar(Mapa_2) = 0;
         void draw(RenderWindow& win) {
             win.draw(sprite);
         }
@@ -88,18 +106,103 @@ class Player {
         }
 */
 
-        void colider(RenderWindow& win){
+        void colider2(RenderWindow& win){
             RectangleShape colider(Vector2f(55, 55));
             colider.setPosition(Vector2f(sprite.getGlobalBounds().getPosition().x, sprite.getGlobalBounds().getPosition().y+30));
             colider.setFillColor(Color::Yellow);
             win.draw(colider);
         }
+//Retorna un bool que verifica si avanzo o no
+        bool validarMovimiento(Mapa_2 map){
+            if(psi.x <= map.getMatrizSprites()[posMx][posMy-1]->getColliderID().x && map.getMatriz()[posMx][posMy-1] != ' '){
+                //cout<<"<-"<<endl;
+                sprite.move(0.5, 0);
+                return false;
+            } else if (pid.x >= map.getMatrizSprites()[posMx][posMy+1]->getColliderSI().x && map.getMatriz()[posMx][posMy+1] != ' '){
+                //cout<<"->"<<endl;
+                sprite.move(-0.5, 0);
+                return false;
+            } else if (psi.y <= map.getMatrizSprites()[posMx-1][posMy]->getColliderID().y && map.getMatriz()[posMx-1][posMy] != ' '){
+                //cout<<"^|^"<<endl;
+                sprite.move(0, 0.5);
+                return false;
+            } else if (pid.y >= map.getMatrizSprites()[posMx+1][posMy]->getColliderSI().y && map.getMatriz()[posMx+1][posMy] != ' '){
+                //cout<<"v|"<<endl;
+                sprite.move(0, -0.5);
+                return false;
+
+            } else {
+                //cout<<" "<<endl;
+                return true;
+            }
+        }
+
+        bool validarMovimiento2(Mapa_2 map){
+            if(map.getMatriz()[posMx][posMy-1] != ' '){
+                if(psi.x < map.getMatrizSprites()[posMx][posMy-1]->getColliderID().x){
+                    cout<<"<-"<<endl;
+                    sprite.move(0.5, 0);
+                    return false;
+                } else {
+                    posMy--;
+                    return true;
+                }
+            }
+            if(map.getMatriz()[posMx][posMy+1] != ' '){
+                if (pid.x > map.getMatrizSprites()[posMx][posMy+1]->getColliderSI().x){
+                    cout<<"->"<<endl;
+                    sprite.move(-0.5, 0);
+                    return false;
+                } else {
+                    posMy++;
+                    return true;
+                }
+            }
+            if(map.getMatriz()[posMx-1][posMy] != ' '){
+                if (psi.y < map.getMatrizSprites()[posMx-1][posMy]->getColliderID().y){
+                    cout<<"^|^"<<endl;
+                    sprite.move(0, 0.5);
+                    return false;
+                } else {
+                    posMx--;
+                    return true;
+                }
+            }
+            if(map.getMatriz()[posMx+1][posMy] != ' '){
+                if (pid.y > map.getMatrizSprites()[posMx+1][posMy]->getColliderSI().y){
+                    cout<<"v|"<<endl;
+                    sprite.move(0, -0.5);
+                    return false;
+
+                } else {
+                    posMx++;
+                    return true;
+                }
+            } else {
+                return true;
+            }   
+        }
+
+        void moverMatriz(Mapa_2 map){
+            cout<<"("<<posMx<<", "<<posMy<<")"<<endl;
+            if(pid.x >= map.getMatrizSprites()[posMx][posMy+1]->getColliderSI().x){
+                posMy++;
+            } else if(psi.x <= map.getMatrizSprites()[posMx][posMy-1]->getColliderID().x){
+                posMy--;
+            } else if(psi.y <= map.getMatrizSprites()[posMx-1][posMy]->getColliderID().y){
+                posMx--;
+            } else if(pid.y >= map.getMatrizSprites()[posMx+1][posMy]->getColliderSI().y){
+                posMx++;
+            }
+        }
 };
 
 class player_one : public Player {
     public:
-        player_one() : Player() {
-            sprite.setPosition(Vector2f(100,100));
+        player_one(Vector2f position) : Player() {
+            posMx = 1;
+            posMy = 1;
+            sprite.setPosition(position);
             if (!(
                 images[0].loadFromFile("images/Character_W_4.png") &&
                 images[1].loadFromFile("images/Character_A_4.png") &&
@@ -109,29 +212,31 @@ class player_one : public Player {
                 cout<<"No se pudo cargar las texturas del jugador"<<endl;
             }
         }
-        void controlar()
+        void controlar(Mapa_2 map)
         {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            {
-                sprite.move(0, -speed);
-                sprite.setTexture(images[0]);
+            //if (validarMovimiento(map) == true){
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+                {
+                    sprite.move(0, -speed);
+                    sprite.setTexture(images[0]);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+                {
+                    sprite.move(0, speed);
+                    sprite.setTexture(images[2]);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+                {
+                    sprite.move(-speed, 0);
+                    sprite.setTexture(images[1]);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
+                {
+                    sprite.move(speed, 0);
+                    sprite.setTexture(images[3]);
+                }
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            {
-                sprite.move(0, speed);
-                sprite.setTexture(images[2]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            {
-                sprite.move(-speed, 0);
-                sprite.setTexture(images[1]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            {
-                sprite.move(speed, 0);
-                sprite.setTexture(images[3]);
-            }
-        }
+        //}
 };
 
 class Player_two : public Player {
@@ -147,7 +252,7 @@ class Player_two : public Player {
                 cout<<"No se pudo cargar las texturas del jugador"<<endl;
             }
         }
-        void controlar()
+        void controlar(Mapa_2 map)
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
             {
@@ -182,8 +287,11 @@ int main() {
     Mapa_2 mapa(WIDTH, HEIGHT);
     mapa.Print();
 
+    Vector2f posPlayer1(HEIGHT/13+10, HEIGHT/13-20);
+    //Vector2f posPlayer1(300,300);
+
     //map.print_layout();
-    player_one player;
+    player_one player(posPlayer1);
     Player_two player_dos;
 
     while (window.isOpen()) {
@@ -196,8 +304,9 @@ int main() {
                 window.close();
         }
         window.clear(Color::Black);
-        player.controlar();
-        player_dos.controlar();
+        player.controlar(mapa);
+        player.moverMatriz(mapa);
+        player_dos.controlar(mapa);
         mapa.draw(window);
         player.draw(window);
         player_dos.draw(window);

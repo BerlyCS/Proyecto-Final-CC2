@@ -15,6 +15,7 @@ class Block{
         Texture texture;
         Sprite sprite;
         float sizeBlock;
+        Vector2f colliderSI, colliderID;
     public:
         Block(int WIDTH, int HEIGHT){
             int x = WIDTH;
@@ -31,8 +32,26 @@ class Block{
             return sprite;
         }
 
+        Vector2f getColliderSI() {return colliderSI;}
+        Vector2f getColliderID() {return colliderID;}
+
         void draw(RenderWindow& window){
+            RectangleShape a(Vector2f(5,5));
+            a.setPosition(colliderSI);
+            a.setFillColor(Color::Blue);
+
+            RectangleShape b(Vector2f(5,5));
+            b.setPosition(colliderID);
+            b.setFillColor(Color::Blue);
+
             window.draw(sprite);
+            window.draw(a);
+            window.draw(b);
+        }
+
+        void setCollider(Vector2f v){
+            colliderSI = v;
+            colliderID = Vector2f(v.x+sizeBlock, v.y+sizeBlock);
         }
 };
 
@@ -100,6 +119,7 @@ public:
                 }
                 auto size = bloque->getTexture().getSize();
                 bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
+                bloque->setCollider(Vector2f(sizeBlock*j, sizeBlock*i));
                 bloque->getSprite().setPosition(sizeBlock * j, sizeBlock * i);
                 filaSprites.push_back(bloque);
             }
@@ -125,7 +145,7 @@ public:
                         if (aux == 0) {
                             matriz[j][k] = ' ';
                         } else {
-                            matriz[j][k] = 'x';
+                            matriz[j][k] = ' ';
                         }
                     }
                 }
@@ -152,5 +172,9 @@ public:
 
     vector<vector<char>> getMatriz(){
         return matriz;
+    }
+
+    vector<vector<Block*>> getMatrizSprites(){
+        return sprites_map;
     }
 };
