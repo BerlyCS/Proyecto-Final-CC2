@@ -1,10 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-
 class Animation {
 public:
-    Animation() : currentFrame(0) {}
+    Animation(float frameDuration) : currentFrame(0), frameDuration(frameDuration), elapsedTime(0.0f) {}
 
     void addFrame(sf::IntRect rect) {
         frames.push_back(rect);
@@ -14,33 +13,43 @@ public:
         sprite.setTextureRect(frames[currentFrame]);
     }
 
-    void update() {
-        currentFrame = (currentFrame + 1) % frames.size();
+    void update(float dt) {
+        elapsedTime += dt;
+        if (elapsedTime >= frameDuration) {
+            elapsedTime = 0.0f;
+            currentFrame = (currentFrame + 1) % frames.size();
+        }
     }
 
 private:
     std::vector<sf::IntRect> frames;
     size_t currentFrame;
+    float frameDuration; // Duración de cada frame en segundos
+    float elapsedTime;   // Tiempo transcurrido desde el último cambio de frame
 };
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Animated Sprite");
+    window.setFramerateLimit(60);
 
     sf::Texture texture;
-    if (!texture.loadFromFile("images/Character_A_4.png")) {
-        return -1; // Error al cargar la textura
+    if (!texture.loadFromFile("images/IMG_20240627_120859.png")) {
+        return -1;
     }
 
     sf::Sprite sprite(texture);
 
-    Animation animation;
-    // Añadir frames de la animación (asumiendo cada frame es de 32x32 píxeles)
-    for (int i = 0; i < 3; ++i) {
-        animation.addFrame(sf::IntRect(i * 32, 0, 32, 32));
-    }
+    float frameDuration = 0.3f;
+    Animation animation(frameDuration);
 
+    for (int i = 0; i < 3; ++i) {
+        animation.addFrame(sf::IntRect(i * 16, 0, 16, 16));
+    }
+    animation.addFrame(sf::IntRect(16, 0, 16, 16));
+
+    sprite.scale(4, 4);
     sprite.setPosition(400, 300);
-    float speed = 100.0f; // Velocidad de movimiento en píxeles por segundo
+    float speed = 100.0f; 
 
     sf::Clock clock;
 
@@ -55,22 +64,27 @@ int main() {
         sf::Time deltaTime = clock.restart();
         float dt = deltaTime.asSeconds();
 
+        bool moving = false;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             sprite.move(-speed * dt, 0);
-            animation.update();
+            moving = true;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             sprite.move(speed * dt, 0);
-            animation.update();
+            moving = true;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
             sprite.move(0, -speed * dt);
-            animation.update();
+            moving = true;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
             sprite.move(0, speed * dt);
-            animation.update();
+            moving = true;
         }
+
+        if (moving) {
+        }
+        animation.update(dt);
 
         animation.applyToSprite(sprite);
 
