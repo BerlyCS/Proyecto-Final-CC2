@@ -2,6 +2,7 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -15,8 +16,10 @@
 #include <ctime>
 #include <fstream>
 #include <string>
-#include <iostream>
+#include<iostream>
 #include "mapa.cpp"
+#include "menu.cpp"
+#include "animation.cpp"
 
 //si encuentran una mejor implementacion pueden aplicarlo sobre lo
 //que ya esta
@@ -24,7 +27,8 @@
 using namespace sf;
 using namespace std;
 
-void place_bomb(Vector2i coords) {
+//WIP
+void place_bomb(Vector2f coords) {
 
 }
 
@@ -60,10 +64,12 @@ class Player {
     protected:
         Texture images[4];
         Sprite sprite;
-        double x,y, speed;
+        Vector2f pos;
+        double speed;
         int bombcount;
+        RectangleShape hitbox;
     public:
-        Player(){
+        Player() {
             speed = 5.0f;
             bombcount = 1;
         }
@@ -78,7 +84,10 @@ class Player {
 
 class Player_one : public Player {
     public:
-        Player_one() : Player() {
+        Player_one(Mapa_2& mapa) : Player() {
+            pos = mapa.get_coords(1, 1);
+            sprite.setPosition(pos);
+
             sprite.setPosition(Vector2f(100,100));
             if (!(
                 images[0].loadFromFile("images/Character_W_4.png") &&
@@ -112,7 +121,7 @@ class Player_one : public Player {
                 sprite.setTexture(images[3]);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                place_bomb(Vector2i(x,y));
+                place_bomb(pos);
             }
         }
 };
@@ -122,10 +131,10 @@ class Player_two : public Player {
         Player_two() : Player() {
             sprite.setPosition(Vector2f(100,100));
             if (!(
-                images[0].loadFromFile("images/Character_W_4.png") &&
-                images[1].loadFromFile("images/Character_A_4.png") &&
-                images[2].loadFromFile("images/Character_S_4.png") &&
-                images[3].loadFromFile("images/Character_D_4.png") 
+                images[0].loadFromFile("images/W1.png") &&
+                images[1].loadFromFile("images/A1.png") &&
+                images[2].loadFromFile("images/S1.png") &&
+                images[3].loadFromFile("images/D1.png") 
                )) {
                 cout<<"No se pudo cargar las texturas del jugador 2"<<endl;
             }
@@ -152,6 +161,9 @@ class Player_two : public Player {
                 sprite.move(speed, 0);
                 sprite.setTexture(images[3]);
             }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+                /* place_bomb(Vector2i(x,y)); */
+            }
         }
 };
 
@@ -161,9 +173,11 @@ int main() {
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
     Mapa_2 mapa(WIDTH, HEIGHT);
+    Menu menu;
     mapa.Print();
+    bool Game_started = false;
 
-    Player_one player;
+    Player_one player(mapa);
     Player_two player_dos;
 
     while (window.isOpen()) {
@@ -174,6 +188,11 @@ int main() {
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
+        if (!Game_started) {
+            menu.handleEvent(window, Game_started);
+            menu.draw(window);
+            continue;
+        }
         window.clear(Color::Black);
         player.controlar();
         player_dos.controlar();
@@ -181,7 +200,6 @@ int main() {
         player.draw(window);
         player_dos.draw(window);
         window.display();
-        //logica aqui
     }
     return EXIT_SUCCESS;
 }
