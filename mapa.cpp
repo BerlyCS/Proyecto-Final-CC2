@@ -18,9 +18,7 @@ class block {
         Sprite& getSprite() {
             return sprite;
         }
-        void setTexture(Texture texture) {
-            sprite.setTexture(texture);
-        }
+
 };
 
 class wall : public block {
@@ -76,6 +74,16 @@ public:
             }
             sprites_map.push_back(filaSprites);
         }
+    }
+
+    /* Toma una coordenada del mapa y retorna la posicion en pantalla*/
+    Vector2f get_coords(int x, int y) {
+        return Vector2f(x*sizeBlock,y*sizeBlock);
+    }
+
+    /*Toma una coordenada de pantalla y retorna la posicion en la matriz*/
+    Vector2f get_coords(Vector2f pos) {
+        return Vector2f(pos.x/sizeBlock, pos.y/sizeBlock);
     }
 
     void generarMatriz() {
