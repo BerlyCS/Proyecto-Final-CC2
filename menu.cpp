@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -66,11 +67,11 @@ public:
         buttons.push_back(Button(Vector2f(100, 200), "Exit", font, 40));
     }
 
-    void handleEvent(RenderWindow& window) {
+    void handleEvent(RenderWindow& window, bool& Game_started) {
         for (auto& button : buttons) {
             if (button.isClicked(window)) {
                 if (button.getText() == "Start") {
-                    std::cout << "Empezar juego" << std::endl;
+                    Game_started = true;
                 } else if (button.getText() == "Exit") {
                     window.close();
                 }
@@ -81,31 +82,32 @@ public:
     void draw(RenderWindow& window) {
         for (auto& button : buttons) {
             button.draw(window);
+            window.display();
         }
     }
 };
 
-int main() {
-    // Crear una ventana
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Imprimir Texto en SFML");
-    window.setFramerateLimit(60);
+/* int main() { */
+/*     // Crear una ventana */
+/*     sf::RenderWindow window(sf::VideoMode(800, 600), "Imprimir Texto en SFML"); */
+/*     window.setFramerateLimit(60); */
 
-    Menu menu;
+/*     Menu menu; */
 
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-                window.close();
-            }
-        }
+/*     while (window.isOpen()) { */
+/*         sf::Event event; */
+/*         while (window.pollEvent(event)) { */
+/*             if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { */
+/*                 window.close(); */
+/*             } */
+/*         } */
 
-        menu.handleEvent(window);
+/*         menu.handleEvent(window); */
 
-        window.clear(); // Limpiar la ventana
-        menu.draw(window);
-        window.display(); // Mostrar el contenido en la ventana
-    }
+/*         window.clear(); // Limpiar la ventana */
+/*         menu.draw(window); */
+/*         window.display(); // Mostrar el contenido en la ventana */
+/*     } */
 
-    return 0;
-}
+/*     return 0; */
+/* } */
