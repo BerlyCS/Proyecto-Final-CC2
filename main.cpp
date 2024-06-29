@@ -92,8 +92,8 @@ class Player_one : public Player {
 
             sprite.setPosition(Vector2f(100,100));
 
-            if (!(texture.loadFromFile("images/IMG_20240628_190401.png"))) {
-                cout<<"No se pudo cargar las texturas del jugador 1"<<endl;
+            if (!(texture.loadFromFile("images/player_one.png"))) {
+                cout<<"No se pudo cargar player_one.png"<<endl;
             }
             sprite.setTexture(texture);
             sprite.scale(Vector2f(4,4));
@@ -190,10 +190,10 @@ int main() {
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    Mapa_2 mapa(WIDTH, HEIGHT);
+    Mapa_2 mapa(WIDTH, HEIGHT, 3);
     Menu menu;
     mapa.Print();
-    bool Game_started = false;
+    bool Game_started = true;
     Clock clock;
 
     Player_one player(mapa);

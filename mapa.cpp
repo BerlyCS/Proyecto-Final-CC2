@@ -1,5 +1,7 @@
 #pragma once
+#include "animation.cpp"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <vector>
@@ -34,17 +36,22 @@ class tile : public block {
 
 class Mapa_2 {
 private:
-    Texture wallTexture;
-    Texture weakWall, tileText;
+    Texture texture;
     float sizeBlock;
     vector< vector<Sprite>> sprites_map;
     vector< vector<char>> matriz;
 
 public:
-    Mapa_2(int WIDTH, int HEIGHT) {
-        wallTexture.loadFromFile("images/wall_4.png");
-        weakWall.loadFromFile("images/weak_wall_4.png");
-        tileText.loadFromFile("images/tile_4.png");
+    Mapa_2(int WIDTH, int HEIGHT, int map_style=0) {
+        texture.loadFromFile("images/wall_textur.png");
+        IntRect frames[3];
+
+        //
+        for(int i =0 ; i<3 ; i++) {
+            frames[2] = IntRect(0,16*map_style,16,16);
+            frames[1] = IntRect(16,16*map_style,16,16);
+            frames[0] = IntRect(32,16*map_style,16,16);
+        }
 
         int x = WIDTH;
         int y = HEIGHT;
@@ -59,15 +66,16 @@ public:
             vector<Sprite> filaSprites;
             for (int j = 0; j < 13; j++) {
                 Sprite sprite;
+                sprite.setTexture(texture);
 
                 if (matriz[i][j] == '#') {
-                    sprite.setTexture(wallTexture);
+                    sprite.setTextureRect(frames[0]);
                 } else if (matriz[i][j] == 'x') {
-                    sprite.setTexture(weakWall);
+                    sprite.setTextureRect(frames[1]);
                 } else {
-                    sprite.setTexture(tileText);
+                    sprite.setTextureRect(frames[2]);
                 }
-                auto size = sprite.getTexture()->getSize();
+                auto size = frames[0].getSize();
                 sprite.setScale(sizeBlock/size.x, sizeBlock/size.y);
                 sprite.setPosition(sizeBlock * j, sizeBlock * i);
                 filaSprites.push_back(sprite);
@@ -127,5 +135,8 @@ public:
                 window.draw(sprites_map[i][j]);
             }
         }
+    }
+    int getBlockSize() {
+        return sizeBlock;
     }
 };
