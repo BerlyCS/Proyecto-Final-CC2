@@ -15,7 +15,6 @@ class Block{
         Texture texture;
         Sprite sprite;
         float sizeBlock;
-        Vector2f colliderSI, colliderID;
     public:
         Block(int WIDTH, int HEIGHT){
             int x = WIDTH;
@@ -32,27 +31,14 @@ class Block{
             return sprite;
         }
 
-        Vector2f getColliderSI() {return colliderSI;}
-        Vector2f getColliderID() {return colliderID;}
-
         void draw(RenderWindow& window){
-            RectangleShape a(Vector2f(5,5));
-            a.setPosition(colliderSI);
-            a.setFillColor(Color::Blue);
-
-            RectangleShape b(Vector2f(5,5));
-            b.setPosition(colliderID);
-            b.setFillColor(Color::Blue);
-
             window.draw(sprite);
-            window.draw(a);
-            window.draw(b);
+            //window.draw(collider);
         }
 
-        void setCollider(Vector2f v){
-            colliderSI = v;
-            colliderID = Vector2f(v.x+sizeBlock, v.y+sizeBlock);
-        }
+        float getBlockSize() {return sizeBlock; }
+
+        virtual bool IsCollidable() = 0;
 };
 
 class Wall : public Block{
@@ -61,6 +47,8 @@ class Wall : public Block{
             texture.loadFromFile("images/wall_1.png");
             sprite.setTexture(texture);
         }
+
+        bool IsCollidable() {return true;}
 };
 
 class WeakWall : public Block{
@@ -69,6 +57,8 @@ class WeakWall : public Block{
             texture.loadFromFile("images/weak_wall_1.png");
             sprite.setTexture(texture);
         }
+
+        bool IsCollidable() {return true;}
 };
 
 class Tile : public Block{
@@ -77,6 +67,8 @@ class Tile : public Block{
             texture.loadFromFile("images/tile_1.png");
             sprite.setTexture(texture);
         }
+
+        bool IsCollidable() {return false;}
 };
 
 class Mapa_2 {
@@ -119,7 +111,6 @@ public:
                 }
                 auto size = bloque->getTexture().getSize();
                 bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
-                bloque->setCollider(Vector2f(sizeBlock*j, sizeBlock*i));
                 bloque->getSprite().setPosition(sizeBlock * j, sizeBlock * i);
                 filaSprites.push_back(bloque);
             }
@@ -145,7 +136,7 @@ public:
                         if (aux == 0) {
                             matriz[j][k] = ' ';
                         } else {
-                            matriz[j][k] = ' ';
+                            matriz[j][k] = 'x';
                         }
                     }
                 }

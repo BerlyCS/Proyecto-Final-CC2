@@ -58,141 +58,46 @@ class Player {
         Texture images[4];
         Sprite sprite;
         double speed;
-        Vector2f psi, pid;
+        Vector2f position;
         int bombcount;
-        int posMx, posMy;
+        RectangleShape collider;
     public:
         Player(){
             speed = 5.0f;
             bombcount = 1;
         }
 //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
-        void colider(RenderWindow& win){
-            psi = Vector2f(sprite.getGlobalBounds().getPosition().x, sprite.getGlobalBounds().getPosition().y+30);
-            pid = Vector2f(sprite.getGlobalBounds().getPosition().x+55, sprite.getGlobalBounds().getPosition().y+85);
-
-            RectangleShape psid (Vector2f(5, 5));
-            psid.setPosition(psi);
-            psid.setFillColor(Color::Red);
-
-            RectangleShape pidd (Vector2f(5, 5));
-            pidd.setPosition(pid);
-            pidd.setFillColor(Color::Red);
-
-            win.draw(pidd);
-            win.draw(psid);
+        void move(Vector2f movement){
+            position += movement;
+            sprite.setPosition(position);
+            collider.setSize(Vector2f(60, 55));
+            collider.setPosition(Vector2f(position.x, position.y+35));
+            collider.setFillColor(Color::Red);
         }
+
 
         //para poder cambiar los controles
         virtual void controlar(Mapa_2) = 0;
         void draw(RenderWindow& win) {
             win.draw(sprite);
+            win.draw(collider);
         }
-/*
-        void validadMovimiento(vector<vector<char>> matriz){
-            int ejex, ejey = 0;
-            int num = 1000/13;
+
+        Sprite getSprite() {return sprite;}
+
+        void checkCollision(Mapa_2& map, Vector2f movement){
+            FloatRect playerBounds = collider.getGlobalBounds();
             for(int i=0; i<13; i++){
-                ejex = 0;
                 for(int j=0; j<13; j++){
-                    if(matriz[i][j] == '#'){
-                        if (sprite.getGlobalBounds().getPosition().x > ejex) sprite.move(-0.9f,0);
+                    Block* block = map.getMatrizSprites()[i][j];
+                    if(block && block->IsCollidable()){
+                        FloatRect blockBounds = block->getSprite().getGlobalBounds();
+                        if(playerBounds.intersects(blockBounds)){
+                            move(-movement);
+                            return;
+                        }
                     }
                 }
-                ejex += num;
-            }
-
-            ejey += num;
-        }
-*/
-
-        void colider2(RenderWindow& win){
-            RectangleShape colider(Vector2f(55, 55));
-            colider.setPosition(Vector2f(sprite.getGlobalBounds().getPosition().x, sprite.getGlobalBounds().getPosition().y+30));
-            colider.setFillColor(Color::Yellow);
-            win.draw(colider);
-        }
-//Retorna un bool que verifica si avanzo o no
-        bool validarMovimiento(Mapa_2 map){
-            if(psi.x <= map.getMatrizSprites()[posMx][posMy-1]->getColliderID().x && map.getMatriz()[posMx][posMy-1] != ' '){
-                //cout<<"<-"<<endl;
-                sprite.move(0.5, 0);
-                return false;
-            } else if (pid.x >= map.getMatrizSprites()[posMx][posMy+1]->getColliderSI().x && map.getMatriz()[posMx][posMy+1] != ' '){
-                //cout<<"->"<<endl;
-                sprite.move(-0.5, 0);
-                return false;
-            } else if (psi.y <= map.getMatrizSprites()[posMx-1][posMy]->getColliderID().y && map.getMatriz()[posMx-1][posMy] != ' '){
-                //cout<<"^|^"<<endl;
-                sprite.move(0, 0.5);
-                return false;
-            } else if (pid.y >= map.getMatrizSprites()[posMx+1][posMy]->getColliderSI().y && map.getMatriz()[posMx+1][posMy] != ' '){
-                //cout<<"v|"<<endl;
-                sprite.move(0, -0.5);
-                return false;
-
-            } else {
-                //cout<<" "<<endl;
-                return true;
-            }
-        }
-
-        bool validarMovimiento2(Mapa_2 map){
-            if(map.getMatriz()[posMx][posMy-1] != ' '){
-                if(psi.x < map.getMatrizSprites()[posMx][posMy-1]->getColliderID().x){
-                    cout<<"<-"<<endl;
-                    sprite.move(0.5, 0);
-                    return false;
-                } else {
-                    posMy--;
-                    return true;
-                }
-            }
-            if(map.getMatriz()[posMx][posMy+1] != ' '){
-                if (pid.x > map.getMatrizSprites()[posMx][posMy+1]->getColliderSI().x){
-                    cout<<"->"<<endl;
-                    sprite.move(-0.5, 0);
-                    return false;
-                } else {
-                    posMy++;
-                    return true;
-                }
-            }
-            if(map.getMatriz()[posMx-1][posMy] != ' '){
-                if (psi.y < map.getMatrizSprites()[posMx-1][posMy]->getColliderID().y){
-                    cout<<"^|^"<<endl;
-                    sprite.move(0, 0.5);
-                    return false;
-                } else {
-                    posMx--;
-                    return true;
-                }
-            }
-            if(map.getMatriz()[posMx+1][posMy] != ' '){
-                if (pid.y > map.getMatrizSprites()[posMx+1][posMy]->getColliderSI().y){
-                    cout<<"v|"<<endl;
-                    sprite.move(0, -0.5);
-                    return false;
-
-                } else {
-                    posMx++;
-                    return true;
-                }
-            } else {
-                return true;
-            }   
-        }
-
-        void moverMatriz(Mapa_2 map){
-            cout<<"("<<posMx<<", "<<posMy<<")"<<endl;
-            if(pid.x >= map.getMatrizSprites()[posMx][posMy+1]->getColliderSI().x){
-                posMy++;
-            } else if(psi.x <= map.getMatrizSprites()[posMx][posMy-1]->getColliderID().x){
-                posMy--;
-            } else if(psi.y <= map.getMatrizSprites()[posMx-1][posMy]->getColliderID().y){
-                posMx--;
-            } else if(pid.y >= map.getMatrizSprites()[posMx+1][posMy]->getColliderSI().y){
-                posMx++;
             }
         }
 };
@@ -200,9 +105,7 @@ class Player {
 class player_one : public Player {
     public:
         player_one(Vector2f position) : Player() {
-            posMx = 1;
-            posMy = 1;
-            sprite.setPosition(position);
+            this->position = position;
             if (!(
                 images[0].loadFromFile("images/Character_W_4.png") &&
                 images[1].loadFromFile("images/Character_A_4.png") &&
@@ -214,35 +117,40 @@ class player_one : public Player {
         }
         void controlar(Mapa_2 map)
         {
-            //if (validarMovimiento(map) == true){
+                Vector2f movement(0.0f, 0.0f);
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
                 {
-                    sprite.move(0, -speed);
+                    movement.y -= speed;
+                    //sprite.move(0, -speed);
                     sprite.setTexture(images[0]);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
                 {
-                    sprite.move(0, speed);
+                    movement.y += speed;
+                    //sprite.move(0, speed);
                     sprite.setTexture(images[2]);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                 {
-                    sprite.move(-speed, 0);
+                    movement.x -= speed;
+                    //sprite.move(-speed, 0);
                     sprite.setTexture(images[1]);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
                 {
-                    sprite.move(speed, 0);
+                    movement.x += speed;
+                    //sprite.move(speed, 0);
                     sprite.setTexture(images[3]);
                 }
+                move(movement);
+                checkCollision(map, movement);
             }
-        //}
 };
 
 class Player_two : public Player {
     public:
-        Player_two() : Player() {
-            sprite.setPosition(Vector2f(100,100));
+        Player_two(Vector2f position) : Player() {
+            this->position = position;
             if (
                 images[0].loadFromFile("images/Character_W_4.png") &&
                 images[1].loadFromFile("images/Character_A_4.png") &&
@@ -254,27 +162,34 @@ class Player_two : public Player {
         }
         void controlar(Mapa_2 map)
         {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-            {
-                sprite.move(0, -speed);
-                sprite.setTexture(images[0]);
+                Vector2f movement(0.0f, 0.0f);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+                {
+                    movement.y -= speed;
+                    //sprite.move(0, -speed);
+                    sprite.setTexture(images[0]);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+                {
+                    movement.y += speed;
+                    //sprite.move(0, speed);
+                    sprite.setTexture(images[2]);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+                {
+                    movement.x -= speed;
+                    //sprite.move(-speed, 0);
+                    sprite.setTexture(images[1]);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
+                {
+                    movement.x += speed;
+                    //sprite.move(speed, 0);
+                    sprite.setTexture(images[3]);
+                }
+                move(movement);
+                checkCollision(map, movement);
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            {
-                sprite.move(0, speed);
-                sprite.setTexture(images[2]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-            {
-                sprite.move(-speed, 0);
-                sprite.setTexture(images[1]);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-            {
-                sprite.move(speed, 0);
-                sprite.setTexture(images[3]);
-            }
-        }
 };
 
 int main() {
@@ -287,12 +202,12 @@ int main() {
     Mapa_2 mapa(WIDTH, HEIGHT);
     mapa.Print();
 
-    Vector2f posPlayer1(HEIGHT/13+10, HEIGHT/13-20);
-    //Vector2f posPlayer1(300,300);
+    Vector2f posPlayer1(WIDTH/13+10, HEIGHT/13-25);
+    Vector2f posPlayer2(WIDTH/13*11+20, HEIGHT/13*11-15);
 
     //map.print_layout();
     player_one player(posPlayer1);
-    Player_two player_dos;
+    Player_two player_dos(posPlayer2);
 
     while (window.isOpen()) {
         Event event;
@@ -305,12 +220,10 @@ int main() {
         }
         window.clear(Color::Black);
         player.controlar(mapa);
-        player.moverMatriz(mapa);
         player_dos.controlar(mapa);
         mapa.draw(window);
         player.draw(window);
         player_dos.draw(window);
-        player.colider(window);
         window.display();
         //logica aqui
     }
