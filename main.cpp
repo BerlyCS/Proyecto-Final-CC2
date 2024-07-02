@@ -2,27 +2,34 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Clock.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Audio.hpp>
-#include <cmath>
 #include <cstdlib>
-#include <ctime>
-#include <fstream>
 #include <string>
-#include <iostream>
+#include<iostream>
 #include "mapa.cpp"
+#include "menu.cpp"
+#include "animation.cpp"
 
 //si encuentran una mejor implementacion pueden aplicarlo sobre lo
 //que ya esta
 
 using namespace sf;
 using namespace std;
+
+//WIP
+void place_bomb(Vector2f coords) {
+
+}
 
 class Bomba {
     private:
@@ -32,7 +39,6 @@ class Bomba {
         int type;
         Time time_placed;
         double x,y;
-        friend class mapa;
     public:
         Bomba(int power, int type, double x, double y, Time time ) : x(x), y(y) {
             this->power = power;
@@ -55,18 +61,21 @@ class Bomba {
 
 class Player {
     protected:
-        Texture images[4];
+        Texture texture;
+        ASprite down_frames, up_frames, left_frames, right_frames;
         Sprite sprite;
         double speed;
         Vector2f position;
-        int bombcount;
         RectangleShape collider;
+        Vector2f pos;
+        int bombcount, bombpower, lives;
+        bool isAlive;
     public:
-        Player(){
+        Player() : down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f) {
             speed = 5.0f;
             bombcount = 1;
         }
-//Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
+    //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
         void move(Vector2f movement){
             position += movement;
             sprite.setPosition(position);
@@ -77,7 +86,8 @@ class Player {
 
 
         //para poder cambiar los controles
-        virtual void controlar(Mapa_2) = 0;
+        virtual void controlar(Mapa_2, float& dt) = 0;
+
         void draw(RenderWindow& win) {
             win.draw(sprite);
             win.draw(collider);
@@ -102,95 +112,68 @@ class Player {
         }
 };
 
-class player_one : public Player {
+class Player_one : public Player {
     public:
-        player_one(Vector2f position) : Player() {
-            this->position = position;
-            if (!(
-                images[0].loadFromFile("images/Character_W_4.png") &&
-                images[1].loadFromFile("images/Character_A_4.png") &&
-                images[2].loadFromFile("images/Character_S_4.png") &&
-                images[3].loadFromFile("images/Character_D_4.png") 
-               )) {
-                cout<<"No se pudo cargar las texturas del jugador"<<endl;
+
+        Player_one(Mapa_2& mapa) : Player() {
+            pos = mapa.get_coords(1, 1);
+            sprite.setPosition(pos);
+
+            sprite.setPosition(Vector2f(100,100));
+
+            if (!(texture.loadFromFile("images/player_one.png"))) {
+                cout<<"No se pudo cargar player_one.png"<<endl;
             }
+            sprite.setTexture(texture);
+            sprite.scale(Vector2f(4,4));
+            down_frames.setRects(0, 0, 16, 24, 3);
+            down_frames.addFrame(IntRect(16,0,16,24));
+            up_frames.setRects(0, 24, 16, 24, 3);
+            up_frames.addFrame(IntRect(16,24,16,24));
+            left_frames.setRects(0, 48, 16, 24, 3);
+            left_frames.addFrame(IntRect(16,48,16,24));
+            right_frames.setRects(0, 72, 16, 24, 3);
+            right_frames.addFrame(IntRect(16,72,16,24));
+
+            down_frames.applyToSprite(sprite);
         }
-        void controlar(Mapa_2 map)
+        void controlar(Mapa_2 map, float& dt)
         {
+                down_frames.update(dt);
+                up_frames.update(dt);
+                left_frames.update(dt);
+                right_frames.update(dt);
                 Vector2f movement(0.0f, 0.0f);
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
                 {
                     movement.y -= speed;
+                    up_frames.applyToSprite(sprite);
                     //sprite.move(0, -speed);
-                    sprite.setTexture(images[0]);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
                 {
                     movement.y += speed;
+                down_frames.applyToSprite(sprite);
                     //sprite.move(0, speed);
-                    sprite.setTexture(images[2]);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                 {
                     movement.x -= speed;
+                left_frames.applyToSprite(sprite);
                     //sprite.move(-speed, 0);
-                    sprite.setTexture(images[1]);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
                 {
                     movement.x += speed;
+                right_frames.applyToSprite(sprite);
                     //sprite.move(speed, 0);
-                    sprite.setTexture(images[3]);
                 }
                 move(movement);
                 checkCollision(map, movement);
             }
 };
 
-class Player_two : public Player {
-    public:
-        Player_two(Vector2f position) : Player() {
-            this->position = position;
-            if (
-                images[0].loadFromFile("images/Character_W_4.png") &&
-                images[1].loadFromFile("images/Character_A_4.png") &&
-                images[2].loadFromFile("images/Character_S_4.png") &&
-                images[3].loadFromFile("images/Character_D_4.png") 
-               ) {
-                cout<<"No se pudo cargar las texturas del jugador"<<endl;
-            }
-        }
-        void controlar(Mapa_2 map)
-        {
-                Vector2f movement(0.0f, 0.0f);
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-                {
-                    movement.y -= speed;
-                    //sprite.move(0, -speed);
-                    sprite.setTexture(images[0]);
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-                {
-                    movement.y += speed;
-                    //sprite.move(0, speed);
-                    sprite.setTexture(images[2]);
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-                {
-                    movement.x -= speed;
-                    //sprite.move(-speed, 0);
-                    sprite.setTexture(images[1]);
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
-                {
-                    movement.x += speed;
-                    //sprite.move(speed, 0);
-                    sprite.setTexture(images[3]);
-                }
-                move(movement);
-                checkCollision(map, movement);
-            }
-};
+
 
 int main() {
     //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
@@ -198,34 +181,42 @@ int main() {
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    //mapa map(WIDTH, HEIGHT);
-    Mapa_2 mapa(WIDTH, HEIGHT);
+    Mapa_2 mapa(WIDTH, HEIGHT, 4);
+    Menu menu;
     mapa.Print();
+    bool Game_started = true;
+    Clock clock;
 
-    Vector2f posPlayer1(WIDTH/13+10, HEIGHT/13-25);
-    Vector2f posPlayer2(WIDTH/13*11+20, HEIGHT/13*11-15);
+    /* Vector2f posPlayer2(WIDTH/13*11+20, HEIGHT/13*11-15); */
 
     //map.print_layout();
-    player_one player(posPlayer1);
-    Player_two player_dos(posPlayer2);
+    Player_one player(mapa);
+    /* Player_two player_dos(posPlayer2); */
+    /* Player_two player_dos; */
 
     while (window.isOpen()) {
         Event event;
         
-        //Eventos
+        //eventos
         while (window.pollEvent(event)) {
             //player.validadMovimiento(mapa.getMatriz());
             if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
+        if (!Game_started) {
+            menu.handleEvent(window, Game_started);
+            menu.draw(window);
+            continue;
+        }
+        float dt = clock.restart().asSeconds();
         window.clear(Color::Black);
-        player.controlar(mapa);
-        player_dos.controlar(mapa);
+        player.controlar(mapa, dt);
+        /* player_dos.controlar(mapa); */
+        /* player_dos.controlar(); */
         mapa.draw(window);
         player.draw(window);
-        player_dos.draw(window);
+        /* player_dos.draw(window); */
         window.display();
-        //logica aqui
     }
     return EXIT_SUCCESS;
 }
