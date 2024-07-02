@@ -13,32 +13,66 @@
 using namespace sf;
 using namespace std;
 
-class block {
+class Block{
     protected:
-        int block_size;
         Sprite sprite;
-        Sprite& getSprite() {
+        float sizeBlock;
+    public:
+        Block(int WIDTH, int HEIGHT){
+            int x = WIDTH;
+            int y = HEIGHT;
+            int min = x > y ? y : x;
+            sizeBlock = (float(min) / 13);
+        }
+
+
+        Sprite& getSprite(){
             return sprite;
         }
 
+        void setSprite(Sprite& sprite) {
+            this->sprite = sprite;
+        }
+
+        void draw(RenderWindow& window){
+            window.draw(sprite);
+            //window.draw(collider);
+        }
+
+        float getBlockSize() {return sizeBlock; }
+
+        virtual bool IsCollidable() = 0;
 };
 
-class wall : public block {
+class Wall : public Block{
+    public:
+        Wall(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
+        }
 
+        bool IsCollidable() {return true;}
 };
 
-class weak_wall : public block {
+class WeakWall : public Block{
+    public:
+        WeakWall(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
+        }
 
+        bool IsCollidable() {return true;}
 };
-class tile : public block {
 
+class Tile : public Block{
+    public:
+        Tile(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
+        }
+
+        bool IsCollidable() {return false;}
 };
 
 class Mapa_2 {
 private:
     Texture texture;
     float sizeBlock;
-    vector< vector<Sprite>> sprites_map;
+    vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
 
 public:
@@ -63,22 +97,26 @@ public:
         generarMatriz();
         // Inicializar sprites_map y matriz
         for (int i = 0; i < 13; i++) {
-            vector<Sprite> filaSprites;
+            vector<Block*> filaSprites;
             for (int j = 0; j < 13; j++) {
+                Block* bloque;
                 Sprite sprite;
                 sprite.setTexture(texture);
-
                 if (matriz[i][j] == '#') {
+                    bloque = new Wall(WIDTH, HEIGHT);
                     sprite.setTextureRect(frames[0]);
                 } else if (matriz[i][j] == 'x') {
+                    bloque = new WeakWall(WIDTH, HEIGHT);
                     sprite.setTextureRect(frames[1]);
                 } else {
+                    bloque = new Tile(WIDTH, HEIGHT);
                     sprite.setTextureRect(frames[2]);
                 }
                 auto size = frames[0].getSize();
-                sprite.setScale(sizeBlock/size.x, sizeBlock/size.y);
-                sprite.setPosition(sizeBlock * j, sizeBlock * i);
-                filaSprites.push_back(sprite);
+                bloque->setSprite(sprite);
+                bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
+                bloque->getSprite().setPosition(sizeBlock * j, sizeBlock * i);
+                filaSprites.push_back(bloque);
             }
             sprites_map.push_back(filaSprites);
         }
@@ -86,6 +124,7 @@ public:
 
     /* Toma una coordenada del mapa y retorna la posicion en pantalla*/
     Vector2f get_coords(int x, int y) {
+        cout<<x*sizeBlock<<' '<<y*sizeBlock<<endl;
         return Vector2f(x*sizeBlock,y*sizeBlock);
     }
 
@@ -132,10 +171,19 @@ public:
     void draw(RenderWindow& window) {
         for (int i = 0; i < 13; i++) {
             for (int j = 0; j < 13; j++) {
-                window.draw(sprites_map[i][j]);
+                sprites_map[i][j]->draw(window);
             }
         }
     }
+
+    vector<vector<char>> getMatriz(){
+        return matriz;
+    }
+
+    vector<vector<Block*>> getMatrizSprites(){
+        return sprites_map;
+    }
+
     int getBlockSize() {
         return sizeBlock;
     }
