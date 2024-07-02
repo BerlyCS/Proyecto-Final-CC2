@@ -190,7 +190,7 @@ int main() {
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    Mapa_2 mapa(WIDTH, HEIGHT, 3);
+    Mapa_2 mapa(WIDTH, HEIGHT, 4);
     Menu menu;
     mapa.Print();
     bool Game_started = true;
