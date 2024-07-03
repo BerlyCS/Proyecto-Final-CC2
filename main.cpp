@@ -67,7 +67,6 @@ class Player {
         double speed;
         Vector2f position;
         RectangleShape collider;
-        Vector2f pos;
         int bombcount, bombpower, lives;
         bool isAlive;
     public:
@@ -115,13 +114,17 @@ class Player_one : public Player {
     public:
 
         Player_one(Mapa_2& mapa) : Player() {
-            pos = mapa.get_coords(2, 2);
+            position = mapa.get_coords(1, 1);
             int blockSize = mapa.getBlockSize();
-            sprite.scale(Vector2f(4,4));
 
             if (!(texture.loadFromFile("images/player_one.png"))) {
                 cout<<"no se cargo";
             }
+
+            sprite.setTexture(texture);
+            auto size = sprite.getTextureRect().getSize();
+            sprite.scale(Vector2f(3,3));
+            sprite.setPosition(position);
 
             down_frames.setRects(0, 0, 16, 24, 3);
             down_frames.addFrame(IntRect(16,0,16,24));
@@ -133,8 +136,8 @@ class Player_one : public Player {
             right_frames.addFrame(IntRect(16,72,16,24));
             down_frames.applyToSprite(sprite);
 
-            collider.setSize(Vector2f(blockSize, blockSize));
-            collider.setPosition(pos);
+            collider.setSize(Vector2f(blockSize-4, blockSize-4));
+            collider.setPosition(position);
         }
         void controlar(Mapa_2 map, float& dt)
         {
@@ -142,7 +145,7 @@ class Player_one : public Player {
                 up_frames.update(dt);
                 left_frames.update(dt);
                 right_frames.update(dt);
-                Vector2f movement(0.0f, 0.0f);
+                Vector2f movement;
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
                 {
                     movement.y -= speed;
@@ -169,7 +172,9 @@ class Player_one : public Player {
                 }
                 move(movement);
                 checkCollision(map, movement);
+                /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
             }
+        
 };
 
 
