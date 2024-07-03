@@ -88,7 +88,7 @@ class Player {
 
         void draw(RenderWindow& win) {
             win.draw(sprite);
-            win.draw(collider);
+            /* win.draw(collider); */
         }
 
         Sprite getSprite() {return sprite;}
@@ -122,9 +122,11 @@ class Player_one : public Player {
             }
 
             sprite.setTexture(texture);
-            auto size = sprite.getTextureRect().getSize();
-            sprite.scale(Vector2f(3,3));
-            sprite.setPosition(position);
+            auto size = sprite.getGlobalBounds();
+            Vector2f newsize = Vector2f(blockSize/16.f, blockSize/16.f);
+            cout<<newsize.x<<' '<<newsize.y<<endl;
+            sprite.scale(newsize);
+            sprite.setPosition(Vector2f(position.x, position.y-position.x*(2.f/3.f)));
 
             down_frames.setRects(0, 0, 16, 24, 3);
             down_frames.addFrame(IntRect(16,0,16,24));
@@ -136,8 +138,7 @@ class Player_one : public Player {
             right_frames.addFrame(IntRect(16,72,16,24));
             down_frames.applyToSprite(sprite);
 
-            collider.setSize(Vector2f(blockSize-4, blockSize-4));
-            collider.setPosition(position);
+            collider.setSize(Vector2f(blockSize-blockSize*0.15, blockSize- blockSize*0.15));
         }
         void controlar(Mapa_2 map, float& dt)
         {
@@ -173,6 +174,8 @@ class Player_one : public Player {
                 move(movement);
                 checkCollision(map, movement);
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
+                auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
+                cout<<pos_mat.x<<' '<<pos_mat.y<<endl;
             }
         
 };
