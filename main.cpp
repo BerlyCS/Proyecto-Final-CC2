@@ -90,7 +90,7 @@ class Player {
 
         void draw(RenderWindow& win) {
             win.draw(sprite);
-            win.draw(collider);
+            /* win.draw(collider); */
         }
 
         Sprite getSprite() {return sprite;}
@@ -117,15 +117,13 @@ class Player_one : public Player {
 
         Player_one(Mapa_2& mapa) : Player() {
             pos = mapa.get_coords(1, 1);
+            int sizeBlock=mapa.getBlockSize();
             sprite.setPosition(pos);
-
-            sprite.setPosition(Vector2f(100,100));
 
             if (!(texture.loadFromFile("images/player_one.png"))) {
                 cout<<"No se pudo cargar player_one.png"<<endl;
             }
-            sprite.setTexture(texture);
-            sprite.scale(Vector2f(4,4));
+
             down_frames.setRects(0, 0, 16, 24, 3);
             down_frames.addFrame(IntRect(16,0,16,24));
             up_frames.setRects(0, 24, 16, 24, 3);
@@ -136,6 +134,8 @@ class Player_one : public Player {
             right_frames.addFrame(IntRect(16,72,16,24));
 
             down_frames.applyToSprite(sprite);
+            auto size = sprite.getTextureRect().getSize();
+            sprite.scale(Vector2f(float(sizeBlock)/size.x, float(sizeBlock)/size.y ));
         }
         void controlar(Mapa_2 map, float& dt)
         {
@@ -177,7 +177,7 @@ class Player_one : public Player {
 
 int main() {
     //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Bomberman");
+    sf::RenderWindow window(sf::VideoMode(600, 600), "Bomberman");
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
