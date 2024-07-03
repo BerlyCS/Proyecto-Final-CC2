@@ -79,7 +79,6 @@ class Player {
         void move(Vector2f movement){
             position += movement;
             sprite.setPosition(position);
-            collider.setSize(Vector2f(60, 55));
             collider.setPosition(Vector2f(position.x, position.y+35));
             collider.setFillColor(Color::Red);
         }
@@ -116,12 +115,12 @@ class Player_one : public Player {
     public:
 
         Player_one(Mapa_2& mapa) : Player() {
-            pos = Vector2f(400,400);
+            pos = mapa.get_coords(1, 1);
             int sizeBlock=mapa.getBlockSize();
             sprite.setPosition(pos);
 
             if (!(texture.loadFromFile("images/player_one.png"))) {
-                cout<<"No se pudo cargar player_one.png"<<endl;
+                cout<<"no se cargo";
             }
             sprite.setTexture(texture);
             down_frames.setRects(0, 0, 16, 24, 3);
@@ -132,10 +131,10 @@ class Player_one : public Player {
             left_frames.addFrame(IntRect(16,48,16,24));
             right_frames.setRects(0, 72, 16, 24, 3);
             right_frames.addFrame(IntRect(16,72,16,24));
-
             down_frames.applyToSprite(sprite);
-            auto size = sprite.getTextureRect().getSize();
-            sprite.scale(Vector2f(float(sizeBlock)/size.x, float(sizeBlock)/size.y ));
+
+            collider.setSize(Vector2f(blockSize, blockSize));
+            collider.setPosition(pos);
         }
         void controlar(Mapa_2 map, float& dt)
         {
@@ -153,19 +152,19 @@ class Player_one : public Player {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
                 {
                     movement.y += speed;
-                down_frames.applyToSprite(sprite);
+                    down_frames.applyToSprite(sprite);
                     //sprite.move(0, speed);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                 {
                     movement.x -= speed;
-                left_frames.applyToSprite(sprite);
+                    left_frames.applyToSprite(sprite);
                     //sprite.move(-speed, 0);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
                 {
                     movement.x += speed;
-                right_frames.applyToSprite(sprite);
+                    right_frames.applyToSprite(sprite);
                     //sprite.move(speed, 0);
                 }
                 move(movement);
@@ -187,12 +186,7 @@ int main() {
     bool Game_started = true;
     Clock clock;
 
-    /* Vector2f posPlayer2(WIDTH/13*11+20, HEIGHT/13*11-15); */
-
-    //map.print_layout();
     Player_one player(mapa);
-    /* Player_two player_dos(posPlayer2); */
-    /* Player_two player_dos; */
 
     while (window.isOpen()) {
         Event event;
