@@ -133,7 +133,7 @@ class Player_one : public Player {
             right_frames.addFrame(IntRect(16,72,16,24));
             down_frames.applyToSprite(sprite);
 
-            collider.setSize(Vector2f(blockSize, blockSize));
+            collider.setSize(Vector2f(24, 23));  
             collider.setPosition(pos);
         }
         void controlar(Mapa_2 map, float& dt)
