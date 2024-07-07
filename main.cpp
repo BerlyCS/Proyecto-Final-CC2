@@ -34,28 +34,27 @@ void place_bomb(Vector2f coords) {
 class Bomba {
     private:
         int power;
-        Texture images[3];
+        Texture images;
         Sprite sprite;
         int type;
         Time time_placed;
         double x,y;
+        ASprite frames;
     public:
-        Bomba(int power, int type, double x, double y, Time time ) : x(x), y(y) {
+        Bomba(int power, int type, double x, double y, Time time ) : x(x), y(y), frames(0.2f) {
             this->power = power;
             this->type = type;
-            images[0].loadFromFile("images/bomb3.png");
-            sprite.setTexture(images[0]);
+            images.loadFromFile("images/bomb3.png");
+            sprite.setTexture(images);
+            frames.setRects(0, 0, 16, 16, 3);
+            frames.applyToSprite(sprite);
             time_placed = time;
         }
 
-        void draw(RenderWindow& window, Time actual_time) {
-            Time seconds_passed = actual_time - time_placed;
-            if (seconds_passed.asMilliseconds() > 3000 ) {
-                
-            } else {
-                window.draw(sprite);
-                return;
-            }
+        void draw(RenderWindow& window, float dt) {
+            frames.update(dt);
+            frames.applyToSprite(sprite);
+            window.draw(sprite);
         }
 };
 
@@ -78,7 +77,7 @@ class Player {
         void move(Vector2f movement){
             position += movement;
             sprite.setPosition(position);
-            collider.setPosition(Vector2f(position.x, position.y+35));
+            collider.setPosition(Vector2f(position.x, position.y + sprite.getGlobalBounds().height*0.45));
             collider.setFillColor(Color::Red);
         }
 
@@ -175,7 +174,7 @@ class Player_one : public Player {
                 checkCollision(map, movement);
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
                 auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
-                cout<<pos_mat.x<<' '<<pos_mat.y<<endl;
+                /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
             }
         
 };
