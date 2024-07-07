@@ -83,7 +83,7 @@ class Player {
 
 
         //para poder cambiar los controles
-        virtual void controlar(Mapa_2, float& dt) = 0;
+        virtual void controlar(Mapa_2&, float&) = 0;
 
         void draw(RenderWindow& win) {
             win.draw(sprite);
@@ -123,7 +123,7 @@ class Player_one : public Player {
             sprite.setTexture(texture);
             auto size = sprite.getGlobalBounds();
             Vector2f newsize = Vector2f(blockSize/16.f, blockSize/16.f);
-            cout<<newsize.x<<' '<<newsize.y<<endl;
+            /* cout<<newsize.x<<' '<<newsize.y<<endl; */
             sprite.scale(newsize);
             sprite.setPosition(Vector2f(position.x, position.y-position.x*(2.f/3.f)));
 
@@ -139,7 +139,7 @@ class Player_one : public Player {
 
             collider.setSize(Vector2f(blockSize-blockSize*0.15, blockSize- blockSize*0.15));
         }
-        void controlar(Mapa_2 map, float& dt)
+        void controlar(Mapa_2 &map, float& dt)
         {
                 down_frames.update(dt);
                 up_frames.update(dt);
