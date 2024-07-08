@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <string>
 #include<iostream>
+#include <cmath>
 #include "mapa.cpp"
 #include "menu.cpp"
 #include "animation.cpp"
@@ -31,7 +32,7 @@ void place_bomb(Vector2f coords) {
 
 }
 
-class Bomba {
+class Bomba2 {
     private:
         int power;
         Texture images[3];
@@ -40,10 +41,10 @@ class Bomba {
         Time time_placed;
         double x,y;
     public:
-        Bomba(int power, int type, double x, double y, Time time ) : x(x), y(y) {
+        Bomba2(int power, int type, double x, double y, Time time ) : x(x), y(y) {
             this->power = power;
             this->type = type;
-            images[0].loadFromFile("images/bomb3.png");
+            images[0].loadFromFile("images/IMG_20240627_120859.png");
             sprite.setTexture(images[0]);
             time_placed = time;
         }
@@ -59,6 +60,52 @@ class Bomba {
         }
 };
 
+class Bomb{
+    private:
+        RectangleShape bomb;
+        Vector2f position;
+        Clock lifeTimer;
+        bool alive;
+    public:
+        Bomb(Vector2f position){
+            bomb.setSize(Vector2f(70, 70));
+            bomb.setPosition(position);
+            bomb.setFillColor(Color::Red);
+            this->position = position;
+            alive = true;
+            lifeTimer.restart();
+        }
+
+        bool isAlive() const {
+            return alive;
+        }
+
+        void update() {
+            if (lifeTimer.getElapsedTime().asSeconds() >= 2.0) {
+                alive = false;
+            }
+        }
+
+        void draw(RenderWindow& window) {
+            if (alive) {
+                window.draw(bomb);
+            }
+        }
+
+        Vector2f getPosition() const {
+            return position;
+        }
+
+        void destroy(Mapa_2 map, Vector2f matrizIndex) {
+            if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
+                cout<<"->"<<endl;
+                delete map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y];
+                map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y] = new Tile(1000,1000);
+            }
+            
+        }
+};
+
 class Player {
     protected:
         Texture texture;
@@ -67,24 +114,27 @@ class Player {
         double speed;
         Vector2f position;
         RectangleShape collider;
-        int bombcount, bombpower, lives;
+        //int bombcount, bombpower, lives;
         bool isAlive;
+        bool isBomb;
+        vector<Bomb> bombs;
     public:
-        Player() : down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f) {
+        Player() : down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f), isBomb(false) {
             speed = 5.0f;
-            bombcount = 1;
+            //bombcount = 1;
         }
+
     //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
         void move(Vector2f movement){
             position += movement;
             sprite.setPosition(position);
-            collider.setPosition(Vector2f(position.x, position.y+35));
-            collider.setFillColor(Color::Red);
+            collider.setPosition(Vector2f(position.x, position.y+40));
+            collider.setFillColor(Color::Transparent);
         }
 
 
         //para poder cambiar los controles
-        virtual void controlar(Mapa_2, float& dt) = 0;
+        virtual void controlar(Mapa_2, RenderWindow& window, float& dt) = 0;
 
         void draw(RenderWindow& win) {
             win.draw(sprite);
@@ -112,8 +162,7 @@ class Player {
 
 class Player_one : public Player {
     public:
-
-        Player_one(Mapa_2& mapa) : Player() {
+        Player_one(Mapa_2& mapa, int WIDTH, int HEIGHT){
             position = mapa.get_coords(1, 1);
             int blockSize = mapa.getBlockSize();
 
@@ -123,7 +172,8 @@ class Player_one : public Player {
 
             sprite.setTexture(texture);
             auto size = sprite.getTextureRect().getSize();
-            sprite.scale(Vector2f(3,3));
+            //sprite.scale(Vector2f((WIDTH/12)/(size.x/3), (HEIGHT/9)/(size.y/4)));
+            sprite.scale(Vector2f(4.5, 4.5));
             sprite.setPosition(position);
 
             down_frames.setRects(0, 0, 16, 24, 3);
@@ -136,10 +186,10 @@ class Player_one : public Player {
             right_frames.addFrame(IntRect(16,72,16,24));
             down_frames.applyToSprite(sprite);
 
-            collider.setSize(Vector2f(blockSize-4, blockSize-4));
+            collider.setSize(Vector2f(blockSize-10, blockSize-10));
             collider.setPosition(position);
         }
-        void controlar(Mapa_2 map, float& dt)
+        void controlar(Mapa_2 map, RenderWindow& window, float& dt)
         {
                 down_frames.update(dt);
                 up_frames.update(dt);
@@ -170,9 +220,36 @@ class Player_one : public Player {
                     right_frames.applyToSprite(sprite);
                     //sprite.move(speed, 0);
                 }
+                if (Keyboard::isKeyPressed(Keyboard::Space)) {
+                    if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
+
+                        Vector2f matrizIndex = map.get_coords(Vector2f(position.x, position.y+40));
+                        Vector2f bombPosition = map.get_coords(matrizIndex.x, matrizIndex.y);
+                        cout<<matrizIndex.x<<", "<<matrizIndex.y<<endl;
+                        cout<<bombPosition.x<<", "<<bombPosition.y<<endl;
+                        Bomb newBomb(bombPosition);
+                        //newBomb.destroy(map, map.get_coords(position));
+                        bombs.push_back(newBomb);
+                        isBomb = true;
+                    }
+                }
+
+                for (auto& bomb : bombs) {
+                    bomb.update();
+                }
                 move(movement);
                 checkCollision(map, movement);
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
+
+                for (auto it = bombs.begin(); it != bombs.end();) {
+                    if (!it->isAlive()) {
+                        it = bombs.erase(it);
+                        isBomb = false;
+                    } else {
+                        it->draw(window);
+                        ++it;
+                    }
+                }
             }
         
 };
@@ -191,7 +268,7 @@ int main() {
     bool Game_started = true;
     Clock clock;
 
-    Player_one player(mapa);
+    Player_one player(mapa, WIDTH, HEIGHT);
 
     while (window.isOpen()) {
         Event event;
@@ -209,10 +286,10 @@ int main() {
         }
         float dt = clock.restart().asSeconds();
         window.clear(Color::Black);
-        player.controlar(mapa, dt);
+        mapa.draw(window);
+        player.controlar(mapa, window, dt);
         /* player_dos.controlar(mapa); */
         /* player_dos.controlar(); */
-        mapa.draw(window);
         player.draw(window);
         /* player_dos.draw(window); */
         window.display();
