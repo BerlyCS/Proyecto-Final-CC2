@@ -1,14 +1,16 @@
 #pragma once
-#include "animation.cpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <queue>
 #include <vector>
 #include <iostream>
 #include <ctime>
 #include <vector>
+#include "animation.cpp"
+#include "bomba.cpp"
 
 
 using namespace sf;
@@ -75,6 +77,7 @@ private:
     float sizeBlock;
     vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
+    queue<Bomba*> bombsEvents;
 
 public:
     Mapa_2(int WIDTH, int HEIGHT, int map_style=0) {
