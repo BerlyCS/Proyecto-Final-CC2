@@ -7,3 +7,6 @@ windows:
 
 bomb: 
 	g++ bomb.cpp -I/usr/include/ -o bomb -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+
+powerup: 
+	g++ powerup.cpp -I/usr/include/ -o powerup -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio

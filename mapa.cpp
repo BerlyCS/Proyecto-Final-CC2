@@ -1,13 +1,16 @@
 #pragma once
-#include "animation.cpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <queue>
 #include <vector>
 #include <iostream>
 #include <ctime>
 #include <vector>
+#include "animation.cpp"
+#include "bomba.cpp"
 
 
 using namespace sf;
@@ -74,6 +77,7 @@ private:
     float sizeBlock;
     vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
+    queue<Bomba*> bombsEvents;
 
 public:
     Mapa_2(int WIDTH, int HEIGHT, int map_style=0) {
@@ -131,6 +135,10 @@ public:
     /*Toma una coordenada de pantalla y retorna la posicion en la matriz*/
     Vector2f get_coords(Vector2f pos) {
         return Vector2f(pos.x/sizeBlock, pos.y/sizeBlock);
+    }
+
+    Vector2i get_mat_coords(Vector2f pos) {
+        return Vector2i(pos.x/sizeBlock, pos.y/sizeBlock);
     }
 
     void generarMatriz() {
