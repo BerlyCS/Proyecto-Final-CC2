@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -31,41 +32,33 @@ class Bomb{
     private:
         RectangleShape bomb;
         Sprite sprite;
-        Texture texture;
         ASprite frames;
         Vector2f position;
         Vector2i m;
         Clock lifeTimer;
         bool alive;
         int radius;
-        SoundBuffer bombexplosion_b;
-        Sound bombexplosion;
 
     public:
-        Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius = 1) : frames(0.1f){
-            texture.loadFromFile("images/IMG_20240627_120859.png");
-
+        Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius = 1) : frames(0.2f){
             //se establece el tamaño de la bomba al tamaño de un bloque del mapa
             bomb.setSize(Vector2f(mapa.getBlockSize(), mapa.getBlockSize()));
             bomb.setPosition(position);
-            bomb.setFillColor(Color::Red);
+            bomb.setFillColor(Color::Transparent);
 
             this->position = position;
             alive = true;
             lifeTimer.restart();
 
-            sprite.setTexture(texture);
-            sprite.setScale(Vector2f(mapa.getBlockSize()/16.f, mapa.getBlockSize()/16.f));
             sprite.setPosition(position);
             frames.setRects(0, 0, 16, 16, 3);
             frames.addFrame(IntRect(16,0,16,16));
             frames.applyToSprite(sprite);
+            sprite.setScale(Vector2f(mapa.getBlockSize()/16.f, mapa.getBlockSize()/16.f));
 
             this->radius = radius; //radius 1
             this->m = mat_pos;
 
-            bombexplosion_b.loadFromFile("./27.wav");
-            bombexplosion.setBuffer(bombexplosion_b);
         }
 
         bool isAlive() const {
@@ -79,9 +72,9 @@ class Bomb{
         }
 
         void draw(RenderWindow& window, float dt) {
+            frames.update(dt);
+            frames.applyToSprite(sprite);
             if (alive) {
-                frames.update(dt);
-                frames.applyToSprite(sprite);
                 window.draw(bomb);
                 window.draw(sprite);
             }
@@ -126,7 +119,6 @@ class Bomb{
                         map.to_tile_at(Vector2i(m.x+i,m.y ));
                     }
                 }
-                bombexplosion.play();
             }
            /* if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
                 cout<<"->"<<endl;
@@ -139,6 +131,10 @@ class Bomb{
             Vector2f size = sprite.getGlobalBounds().getSize();
             Vector2f pos = sprite.getPosition();
             return Vector2f(pos.x + size.x/2, pos.y + size.y/2);
+        }
+
+        Sprite& get_sprite() {
+            return sprite;
         }
 };
 
@@ -156,6 +152,8 @@ class Player {
         vector<Bomb> bombs;
         SoundBuffer bombplace_b;
         Sound bombplace;
+        SoundBuffer bombexplosion_b;
+        Sound bombexplosion;
 
         Vector2f get_center_pos() {
             Vector2f size = collider.getSize();
@@ -167,8 +165,11 @@ class Player {
         Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), right_frames(0.15f), isBomb(false) {
             bombplace_b.loadFromFile("26.wav");
             bombplace.setBuffer(bombplace_b);
+            bombexplosion_b.loadFromFile("27.wav");
+            bombexplosion.setBuffer(bombexplosion_b);
             speed = 5.0f;
             bombcount = 1;
+            bombpower = 1;
         }
 
     //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
@@ -279,7 +280,7 @@ class Player_one : public Player {
                         cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
                         Vector2f bombPosition = map.get_coords(matrizIndex);
                         cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
-                        Bomb newBomb(map, bombPosition, matrizIndex);
+                        Bomb newBomb(map, bombPosition, matrizIndex, bombpower);
                         bombs.push_back(newBomb);
                         isBomb = true;
                     }
@@ -294,15 +295,22 @@ class Player_one : public Player {
 
                 for (auto it = bombs.begin(); it != bombs.end();) {
                     if (!it->isAlive()) {
+                        bombexplosion.play();
                         it->destroy(map);
                         it = bombs.erase(it);
                         isBomb = false;
                     } else {
+                        //Por alguna razon la textura carga bien aqui
+                        //pero en la clase bomba no
+                        Texture tpgftoek;
+                        tpgftoek.loadFromFile("images/bomb.png");
                         it->draw(window,dt);
+                        it->get_sprite().setTexture(tpgftoek);
+                        window.draw(it->get_sprite());
                         ++it;
                     }
                 }
-                auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
+                /* auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition())); */
                 /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
             }
         
