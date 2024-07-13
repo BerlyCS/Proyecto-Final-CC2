@@ -116,9 +116,9 @@ public:
         matriz = vector<vector<char>>(13, vector<char>(13, ' '));
         generarMatriz();
         // Inicializar sprites_map y matriz
-        for (int i = 0; i < 13; i++) {
+        for (int j = 0; j < 13; j++) {
             vector<Block*> filaSprites;
-            for (int j = 0; j < 13; j++) {
+            for (int i = 0; i < 13; i++) {
                 Block* bloque;
                 Sprite sprite;
                 sprite.setTexture(texture);

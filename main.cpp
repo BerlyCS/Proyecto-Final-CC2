@@ -1,5 +1,6 @@
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Audio/SoundBufferRecorder.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -33,11 +34,15 @@ class Bomb{
         Texture texture;
         ASprite frames;
         Vector2f position;
+        Vector2i m;
         Clock lifeTimer;
         bool alive;
         int radius;
+        SoundBuffer bombexplosion_b;
+        Sound bombexplosion;
+
     public:
-        Bomb(Mapa_2& mapa, Vector2f position, int radius = 1) : frames(0.1f){
+        Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius = 1) : frames(0.1f){
             texture.loadFromFile("images/IMG_20240627_120859.png");
 
             //se establece el tamaño de la bomba al tamaño de un bloque del mapa
@@ -57,21 +62,25 @@ class Bomb{
             frames.applyToSprite(sprite);
 
             this->radius = radius; //radius 1
+            this->m = mat_pos;
+
+            bombexplosion_b.loadFromFile("./27.wav");
+            bombexplosion.setBuffer(bombexplosion_b);
         }
 
         bool isAlive() const {
             return alive;
         }
 
-        void update(float dt) {
-            frames.update(dt);
+        void update() {
             if (lifeTimer.getElapsedTime().asSeconds() >= 2.0) {
                 alive = false;
             }
         }
 
-        void draw(RenderWindow& window) {
+        void draw(RenderWindow& window, float dt) {
             if (alive) {
+                frames.update(dt);
                 frames.applyToSprite(sprite);
                 window.draw(bomb);
                 window.draw(sprite);
@@ -87,7 +96,7 @@ class Bomb{
 
         //Por alguna razon se borran los objetos en
         //con las coordenadas invertidas
-        void destroy(Mapa_2 &map, Vector2i m) {
+        void destroy(Mapa_2 &map) {
             for (int i = 1; i<=radius; i++) {
                 //up tiles
                 if ( m.y - i >= 0 ) {
@@ -117,6 +126,7 @@ class Bomb{
                         map.to_tile_at(Vector2i(m.x+i,m.y ));
                     }
                 }
+                bombexplosion.play();
             }
            /* if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
                 cout<<"->"<<endl;
@@ -124,6 +134,11 @@ class Bomb{
                 map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y] = new Tile(map.get_screen_size().x, map.get_screen_size().y);
             }*/
             
+        }
+        Vector2f get_center_pos() {
+            Vector2f size = sprite.getGlobalBounds().getSize();
+            Vector2f pos = sprite.getPosition();
+            return Vector2f(pos.x + size.x/2, pos.y + size.y/2);
         }
 };
 
@@ -258,21 +273,20 @@ class Player_one : public Player {
                 if (Keyboard::isKeyPressed(Keyboard::Space)) {
 
                     if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
-                        bombplace.play();
                         Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
+                        bombplace.play();
                         /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
                         cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
                         Vector2f bombPosition = map.get_coords(matrizIndex);
                         cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
-                        Bomb newBomb(map, bombPosition);
-                        newBomb.destroy(map, matrizIndex);
+                        Bomb newBomb(map, bombPosition, matrizIndex);
                         bombs.push_back(newBomb);
                         isBomb = true;
                     }
                 }
 
                 for (auto& bomb : bombs) {
-                    bomb.update(dt);
+                    bomb.update();
                 }
                 move(movement);
                 checkCollision(map, movement);
@@ -280,10 +294,11 @@ class Player_one : public Player {
 
                 for (auto it = bombs.begin(); it != bombs.end();) {
                     if (!it->isAlive()) {
+                        it->destroy(map);
                         it = bombs.erase(it);
                         isBomb = false;
                     } else {
-                        it->draw(window);
+                        it->draw(window,dt);
                         ++it;
                     }
                 }
@@ -301,7 +316,7 @@ int main() {
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    Mapa_2 mapa(WIDTH, HEIGHT, 4);
+    Mapa_2 mapa(WIDTH, HEIGHT, 1);
     Menu menu;
     mapa.Print();
     bool Game_started = true;
