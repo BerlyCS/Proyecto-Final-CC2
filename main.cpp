@@ -233,7 +233,7 @@ class Player_one : public Player {
 
 int main() {
     //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
-    sf::RenderWindow window(sf::VideoMode(700, 700), "Bomberman");
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Bomberman");
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
