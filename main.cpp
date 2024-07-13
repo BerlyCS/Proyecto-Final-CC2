@@ -17,6 +17,7 @@
 #include <string>
 #include<iostream>
 #include <cmath>
+#include <tuple>
 #include "mapa.cpp"
 #include "menu.cpp"
 #include "animation.cpp"
@@ -30,24 +31,42 @@ using namespace std;
 class Bomb{
     private:
         RectangleShape bomb;
+        Sprite sprite;
+        Texture texture;
+        ASprite frames;
         Vector2f position;
         Clock lifeTimer;
         bool alive;
+        int radius;
     public:
-        Bomb(Mapa_2& mapa, Vector2f position){
+        Bomb(Mapa_2& mapa, Vector2f position, int radius = 1) : frames(0.1f){
+            texture.loadFromFile("images/IMG_20240627_120859.png");
+
+            //se establece el tamaño de la bomba al tamaño de un bloque del mapa
             bomb.setSize(Vector2f(mapa.getBlockSize(), mapa.getBlockSize()));
             bomb.setPosition(position);
             bomb.setFillColor(Color::Red);
+
             this->position = position;
             alive = true;
             lifeTimer.restart();
+
+            sprite.setTexture(texture);
+            sprite.setScale(Vector2f(mapa.getBlockSize()/16.f, mapa.getBlockSize()/16.f));
+            sprite.setPosition(position);
+            frames.setRects(0, 0, 16, 16, 3);
+            frames.addFrame(IntRect(16,0,16,16));
+            frames.applyToSprite(sprite);
+
+            this->radius = radius; //radius 1
         }
 
         bool isAlive() const {
             return alive;
         }
 
-        void update() {
+        void update(float dt) {
+            frames.update(dt);
             if (lifeTimer.getElapsedTime().asSeconds() >= 2.0) {
                 alive = false;
             }
@@ -55,7 +74,9 @@ class Bomb{
 
         void draw(RenderWindow& window) {
             if (alive) {
+                frames.applyToSprite(sprite);
                 window.draw(bomb);
+                window.draw(sprite);
             }
         }
 
@@ -67,12 +88,42 @@ class Bomb{
         }
 
         void destroy(Mapa_2 &map, Vector2i matrizIndex) {
-            cout<<"matrizIndex"<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
-            if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
+            for (int i = 1; i<=radius; i++) {
+                //up tiles
+                if ( matrizIndex.y - i >= 0 ) {
+                    if ( map.get_block_at(matrizIndex.x, matrizIndex.y - i)->IsBreakable() ) {
+                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
+                        map.get_block_at(matrizIndex.x, matrizIndex.y - i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                        
+                    }
+                }
+                //down tiles
+                if ( matrizIndex.y + i <= 13 ) {
+                    if ( map.get_block_at(matrizIndex.x, matrizIndex.y + i)->IsBreakable() ) {
+                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
+                        map.get_block_at(matrizIndex.x, matrizIndex.y + i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                    }
+                }
+                //left tiles
+                if ( matrizIndex.x - i >= 0 ) {
+                    if ( map.get_block_at(matrizIndex.x - i, matrizIndex.y)->IsBreakable() ) {
+                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
+                        map.get_block_at(matrizIndex.x - i, matrizIndex.y + i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                    }
+                }
+                //right tiles
+                if ( matrizIndex.x + i <= 13 ) {
+                    if ( map.get_block_at(matrizIndex.x + i, matrizIndex.y)->IsBreakable() ) {
+                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
+                        map.get_block_at(matrizIndex.x + i, matrizIndex.y + i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                    }
+                }
+            }
+           /* if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
                 cout<<"->"<<endl;
                 delete map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y];
                 map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y] = new Tile(map.get_screen_size().x, map.get_screen_size().y);
-            }
+            }*/
             
         }
 };
@@ -89,6 +140,13 @@ class Player {
         bool isAlive;
         bool isBomb;
         vector<Bomb> bombs;
+
+        Vector2f get_center_pos() {
+            Vector2f size = collider.getSize();
+            Vector2f pos = collider.getPosition();
+            return Vector2f(pos.x + size.x/2, pos.y + size.y/2);
+        }
+
     public:
         Player() : down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f), isBomb(false) {
             speed = 5.0f;
@@ -118,7 +176,7 @@ class Player {
             FloatRect playerBounds = collider.getGlobalBounds();
             for(int i=0; i<13; i++){
                 for(int j=0; j<13; j++){
-                    Block* block = map.getMatrizSprites()[i][j];
+                    Block* block = map.get_block_at(i, j);
                     if(block!=nullptr){
                         if (block->IsCollidable()) {
                         FloatRect blockBounds = block->getSprite().getGlobalBounds();
@@ -134,9 +192,10 @@ class Player {
 };
 
 class Player_one : public Player {
+
     public:
         Player_one(Mapa_2& mapa, int WIDTH, int HEIGHT){
-            position = mapa.get_coords(1, 1);
+            position = mapa.get_coords(Vector2i(1,1));
             int blockSize = mapa.getBlockSize();
 
             if (!(texture.loadFromFile("images/player_one.png"))) {
@@ -196,10 +255,11 @@ class Player_one : public Player {
                 if (Keyboard::isKeyPressed(Keyboard::Space)) {
                     if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
 
-                        Vector2i matrizIndex = map.get_coords(Vector2f(position.x, position.y+40));
-                        Vector2f bombPosition = map.get_coords(matrizIndex.x, matrizIndex.y);
-                        cout<<matrizIndex.x<<", "<<matrizIndex.y<<endl;
-                        cout<<bombPosition.x<<", "<<bombPosition.y<<endl;
+                        Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
+                        /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
+                        /* cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl; */
+                        Vector2f bombPosition = map.get_coords(matrizIndex);
+                        cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
                         Bomb newBomb(map, bombPosition);
                         newBomb.destroy(map, map.get_mat_coords(position));
                         bombs.push_back(newBomb);
@@ -208,7 +268,7 @@ class Player_one : public Player {
                 }
 
                 for (auto& bomb : bombs) {
-                    bomb.update();
+                    bomb.update(dt);
                 }
                 move(movement);
                 checkCollision(map, movement);
