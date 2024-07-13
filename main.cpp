@@ -16,8 +16,6 @@
 #include <cstdlib>
 #include <string>
 #include<iostream>
-#include <cmath>
-#include <tuple>
 #include "mapa.cpp"
 #include "menu.cpp"
 #include "animation.cpp"
@@ -87,6 +85,8 @@ class Bomb{
             return center_pos;
         }
 
+        //Por alguna razon se borran los objetos en
+        //con las coordenadas invertidas
         void destroy(Mapa_2 &map, Vector2i m) {
             for (int i = 1; i<=radius; i++) {
                 //up tiles
@@ -150,7 +150,7 @@ class Player {
 
     public:
         Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), right_frames(0.15f), isBomb(false) {
-            bombplace_b.loadFromFile("");
+            bombplace_b.loadFromFile("26.wav");
             bombplace.setBuffer(bombplace_b);
             speed = 5.0f;
             bombcount = 1;
@@ -258,7 +258,7 @@ class Player_one : public Player {
                 if (Keyboard::isKeyPressed(Keyboard::Space)) {
 
                     if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
-
+                        bombplace.play();
                         Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
                         /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
                         cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;

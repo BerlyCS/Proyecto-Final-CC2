@@ -58,6 +58,8 @@ class Wall : public Block{
 
         bool IsCollidable() {return true;}
         bool IsBreakable() {return false;}
+
+        ~Wall() = default;
 };
 
 class WeakWall : public Block{
@@ -67,6 +69,8 @@ class WeakWall : public Block{
 
         bool IsCollidable() {return true;}
         bool IsBreakable() {return true;}
+
+        ~WeakWall() = default;
 };
 
 class Tile : public Block{
@@ -76,6 +80,8 @@ class Tile : public Block{
 
         bool IsCollidable() {return false;}
         bool IsBreakable() {return false;}
+        
+        ~Tile() = default;
 };
 
 class Mapa_2 {
@@ -137,9 +143,15 @@ public:
     }
 
     void to_tile_at(Vector2i index) {
+        cout<<flush<<"Deleting: "<<index.x<<' '<<index.y<<' '<<sprites_map[index.x][index.y]<<endl;
+        cout<<flush<<"deleting..."<<endl;
+        /* delete sprites_map[index.y][index.x]; */
+        cout<<flush<<"deleted!"<<endl;
+        cout<<flush<<"setting new tile..."<<endl;
+        sprites_map[index.x][index.y] = new Tile(get_screen_size().x, get_screen_size().y);
         Block* bloque = sprites_map[index.x][index.y];
-        delete bloque;
-        bloque = new Tile(get_screen_size().x, get_screen_size().y);
+
+        cout<<flush<<"done..."<<endl;
 
         Sprite sprite;
         sprite.setTexture(texture);

@@ -1,5 +1,5 @@
 main:
-	g++ main.cpp -I/usr/include/ -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -g3 -Wall -Wextra
+	g++ main.cpp mapa.cpp menu.cpp -I/usr/include/ -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -g3 -Wall -Wextra
 	./test.exe
 
 windows:
