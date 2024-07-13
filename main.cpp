@@ -21,122 +21,13 @@
 #include "mapa.cpp"
 #include "menu.cpp"
 #include "animation.cpp"
+#include "bomb.cpp"
 
 //si encuentran una mejor implementacion pueden aplicarlo sobre lo
 //que ya esta
 
 using namespace sf;
 using namespace std;
-
-class Bomb{
-    private:
-        RectangleShape bomb;
-        Sprite sprite;
-        ASprite frames;
-        Vector2f position;
-        Vector2i m;
-        Clock lifeTimer;
-        bool alive;
-        int radius;
-
-    public:
-        Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius = 1) : frames(0.2f){
-            //se establece el tamaño de la bomba al tamaño de un bloque del mapa
-            bomb.setSize(Vector2f(mapa.getBlockSize(), mapa.getBlockSize()));
-            bomb.setPosition(position);
-            bomb.setFillColor(Color::Transparent);
-
-            this->position = position;
-            alive = true;
-            lifeTimer.restart();
-
-            sprite.setPosition(position);
-            frames.setRects(0, 0, 16, 16, 3);
-            frames.addFrame(IntRect(16,0,16,16));
-            frames.applyToSprite(sprite);
-            sprite.setScale(Vector2f(mapa.getBlockSize()/16.f, mapa.getBlockSize()/16.f));
-
-            this->radius = radius; //radius 1
-            this->m = mat_pos;
-
-        }
-
-        bool isAlive() const {
-            return alive;
-        }
-
-        void update() {
-            if (lifeTimer.getElapsedTime().asSeconds() >= 2.0) {
-                alive = false;
-            }
-        }
-
-        void draw(RenderWindow& window, float dt) {
-            frames.update(dt);
-            frames.applyToSprite(sprite);
-            if (alive) {
-                window.draw(bomb);
-                window.draw(sprite);
-            }
-        }
-
-        Vector2f getPosition() const {
-            auto size = bomb.getSize();
-            auto pos = bomb.getPosition();
-            Vector2f center_pos = Vector2f(pos.x+size.x/2, pos.y+size.y/2);
-            return center_pos;
-        }
-
-        //Por alguna razon se borran los objetos en
-        //con las coordenadas invertidas
-        void destroy(Mapa_2 &map) {
-            for (int i = 1; i<=radius; i++) {
-                //up tiles
-                if ( m.y - i >= 0 ) {
-                    if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {
-                        delete map.get_block_at(m.x, m.y - i);
-                        map.to_tile_at(Vector2i(m.x,m.y - i));
-                    }
-                }
-                //down tiles
-                if ( m.y + i <= 13 ) {
-                    if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
-                        delete map.get_block_at(m.x, m.y + i);
-                        map.to_tile_at(Vector2i(m.x,m.y + i));
-                    }
-                }
-                //left tiles
-                if ( m.x - i > 0 ) {
-                    if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
-                        delete map.get_block_at(m.x - i, m.y);
-                        map.to_tile_at(Vector2i(m.x - i,m.y));
-                    }
-                }
-                //right tiles
-                if ( m.x + i < 13 ) {
-                    if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
-                        delete map.get_block_at(m.x+i, m.y);
-                        map.to_tile_at(Vector2i(m.x+i,m.y ));
-                    }
-                }
-            }
-           /* if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
-                cout<<"->"<<endl;
-                delete map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y];
-                map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y] = new Tile(map.get_screen_size().x, map.get_screen_size().y);
-            }*/
-            
-        }
-        Vector2f get_center_pos() {
-            Vector2f size = sprite.getGlobalBounds().getSize();
-            Vector2f pos = sprite.getPosition();
-            return Vector2f(pos.x + size.x/2, pos.y + size.y/2);
-        }
-
-        Sprite& get_sprite() {
-            return sprite;
-        }
-};
 
 class Player {
     protected:
@@ -280,8 +171,7 @@ class Player_one : public Player {
                         cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
                         Vector2f bombPosition = map.get_coords(matrizIndex);
                         cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
-                        Bomb newBomb(map, bombPosition, matrizIndex, bombpower);
-                        bombs.push_back(newBomb);
+                        bombs.push_back(Bomb(map, bombPosition, matrizIndex, bombpower));
                         isBomb = true;
                     }
                 }
@@ -300,13 +190,7 @@ class Player_one : public Player {
                         it = bombs.erase(it);
                         isBomb = false;
                     } else {
-                        //Por alguna razon la textura carga bien aqui
-                        //pero en la clase bomba no
-                        Texture tpgftoek;
-                        tpgftoek.loadFromFile("images/bomb.png");
                         it->draw(window,dt);
-                        it->get_sprite().setTexture(tpgftoek);
-                        window.draw(it->get_sprite());
                         ++it;
                     }
                 }
