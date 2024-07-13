@@ -45,6 +45,8 @@ class Block{
         float getBlockSize() {return sizeBlock; }
 
         virtual bool IsCollidable() = 0;
+
+        virtual ~Block() = default;
 };
 
 class Wall : public Block{
@@ -78,9 +80,11 @@ private:
     vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
     queue<Bomba*> bombsEvents;
+    Vector2i screen_size;
 
 public:
     Mapa_2(int WIDTH, int HEIGHT, int map_style=0) {
+        screen_size = Vector2i(WIDTH, HEIGHT);
         texture.loadFromFile("images/wall_textur.png");
         IntRect frames[3];
 
@@ -126,15 +130,19 @@ public:
         }
     }
 
+    Vector2i get_screen_size() const {
+        return screen_size;
+    }
+
     /* Toma una coordenada del mapa y retorna la posicion en pantalla*/
-    Vector2f get_coords(int x, int y) {
+    Vector2f get_coords(int x, int y) const {
         cout<<x*sizeBlock<<' '<<y*sizeBlock<<endl;
         return Vector2f(x*sizeBlock,y*sizeBlock);
     }
 
     /*Toma una coordenada de pantalla y retorna la posicion en la matriz*/
-    Vector2f get_coords(Vector2f pos) {
-        return Vector2f(pos.x/sizeBlock, pos.y/sizeBlock);
+    Vector2i get_coords(Vector2f pos) {
+        return Vector2i(pos.x/sizeBlock, pos.y/sizeBlock);
     }
 
     Vector2i get_mat_coords(Vector2f pos) {
