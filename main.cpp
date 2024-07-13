@@ -20,16 +20,9 @@
 #include "menu.cpp"
 #include "animation.cpp"
 
-//si encuentran una mejor implementacion pueden aplicarlo sobre lo
-//que ya esta
 
 using namespace sf;
 using namespace std;
-
-//WIP
-void place_bomb(Vector2f coords) {
-
-}
 
 
 class Player {
@@ -150,24 +143,96 @@ class Player_one : public Player {
                 auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
                 /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
             }
-        
 };
 
+class Player_two : public Player {
+    public:
 
+        Player_two(Mapa_2& mapa) : Player() {
+            position = mapa.get_coords(11, 10);
+            int blockSize = mapa.getBlockSize();
+
+            if (!(texture.loadFromFile("images/player2.png"))) {
+                cout<<"no se cargo";
+            }
+
+            sprite.setTexture(texture);
+            auto size = sprite.getGlobalBounds();
+            Vector2f newsize = Vector2f(blockSize/16.f, blockSize/16.f);
+            /* cout<<newsize.x<<' '<<newsize.y<<endl; */
+            sprite.scale(newsize);
+            sprite.setPosition(Vector2f(position.x, position.y-position.x*(2.f/3.f)));
+
+            int size_x = 18, size_y=32;
+            down_frames.setRects(0, 0, size_x, size_y, 3);
+            down_frames.addFrame(IntRect(18,0,18,32));
+            up_frames.setRects(0, 32, size_x, size_y, 3);
+            up_frames.addFrame(IntRect(18,32,size_x,size_y));
+            left_frames.setRects(0, 64, size_x, size_y, 3);
+            left_frames.addFrame(IntRect(18,64,size_x,size_y));
+            right_frames.setRects(0, 96, size_x, size_y, 3);
+            right_frames.addFrame(IntRect(18,96,size_x,size_y));
+            down_frames.applyToSprite(sprite);
+
+            collider.setSize(Vector2f(blockSize-blockSize*0.15, blockSize- blockSize*0.15));
+        }
+        void controlar(Mapa_2 &map, float& dt)
+        {
+                down_frames.update(dt);
+                up_frames.update(dt);
+                left_frames.update(dt);
+                right_frames.update(dt);
+                Vector2f movement;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+                {
+                    movement.y -= speed;
+                    up_frames.applyToSprite(sprite);
+                    //sprite.move(0, -speed);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+                {
+                    movement.y += speed;
+                    down_frames.applyToSprite(sprite);
+                    //sprite.move(0, speed);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+                {
+                    movement.x -= speed;
+                    left_frames.applyToSprite(sprite);
+                    //sprite.move(-speed, 0);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
+                {
+                    movement.x += speed;
+                    right_frames.applyToSprite(sprite);
+                    //sprite.move(speed, 0);
+                }
+                move(movement);
+                checkCollision(map, movement);
+                /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
+                auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
+                /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
+            }
+};
 
 int main() {
     //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
-    sf::RenderWindow window(sf::VideoMode(300, 300), "Bomberman");
+    RenderWindow window(VideoMode(700, 700), "Bomberman");
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
+
     Mapa_2 mapa(WIDTH, HEIGHT, 4);
-    Menu menu;
     mapa.Print();
+
+    Menu menu;
+
     bool Game_started = true;
+
     Clock clock;
 
     Player_one player(mapa);
+    Player_two player2(mapa);
 
     while (window.isOpen()) {
         Event event;
@@ -190,6 +255,8 @@ int main() {
         /* player_dos.controlar(); */
         mapa.draw(window);
         player.draw(window);
+        player2.draw(window);
+        player2.controlar(mapa, dt);
         /* player_dos.draw(window); */
         window.display();
     }
