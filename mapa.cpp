@@ -136,6 +136,22 @@ public:
         }
     }
 
+    void to_tile_at(Vector2i index) {
+        Block* bloque = sprites_map[index.x][index.y];
+        delete bloque;
+        bloque = new Tile(get_screen_size().x, get_screen_size().y);
+
+        Sprite sprite;
+        sprite.setTexture(texture);
+        IntRect frames = IntRect(0,16*map_style,16,16);
+        sprite.setTextureRect(frames);
+
+        auto size = frames.getSize();
+        bloque->setSprite(sprite);
+        bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
+        bloque->getSprite().setPosition(sizeBlock * index.x, sizeBlock * index.y);
+    }
+
     Vector2i get_screen_size() const {
         return screen_size;
     }

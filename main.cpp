@@ -87,35 +87,34 @@ class Bomb{
             return center_pos;
         }
 
-        void destroy(Mapa_2 &map, Vector2i matrizIndex) {
+        void destroy(Mapa_2 &map, Vector2i m) {
             for (int i = 1; i<=radius; i++) {
                 //up tiles
-                if ( matrizIndex.y - i >= 0 ) {
-                    if ( map.get_block_at(matrizIndex.x, matrizIndex.y - i)->IsBreakable() ) {
-                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
-                        map.get_block_at(matrizIndex.x, matrizIndex.y - i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
-                        
+                if ( m.y - i >= 0 ) {
+                    if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {
+                        delete map.get_block_at(m.x, m.y - i);
+                        map.to_tile_at(Vector2i(m.x,m.y - i));
                     }
                 }
                 //down tiles
-                if ( matrizIndex.y + i <= 13 ) {
-                    if ( map.get_block_at(matrizIndex.x, matrizIndex.y + i)->IsBreakable() ) {
-                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
-                        map.get_block_at(matrizIndex.x, matrizIndex.y + i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                if ( m.y + i <= 13 ) {
+                    if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
+                        delete map.get_block_at(m.x, m.y + i);
+                        map.to_tile_at(Vector2i(m.x,m.y + i));
                     }
                 }
                 //left tiles
-                if ( matrizIndex.x - i >= 0 ) {
-                    if ( map.get_block_at(matrizIndex.x - i, matrizIndex.y)->IsBreakable() ) {
-                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
-                        map.get_block_at(matrizIndex.x - i, matrizIndex.y + i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                if ( m.x - i > 0 ) {
+                    if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
+                        delete map.get_block_at(m.x - i, m.y);
+                        map.to_tile_at(Vector2i(m.x - i,m.y));
                     }
                 }
                 //right tiles
-                if ( matrizIndex.x + i <= 13 ) {
-                    if ( map.get_block_at(matrizIndex.x + i, matrizIndex.y)->IsBreakable() ) {
-                        delete map.get_block_at(matrizIndex.x, matrizIndex.y + i);
-                        map.get_block_at(matrizIndex.x + i, matrizIndex.y + i) = new Tile(map.get_screen_size().x, map.get_screen_size().y);
+                if ( m.x + i < 13 ) {
+                    if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
+                        delete map.get_block_at(m.x+i, m.y);
+                        map.to_tile_at(Vector2i(m.x+i,m.y ));
                     }
                 }
             }
@@ -140,6 +139,8 @@ class Player {
         bool isAlive;
         bool isBomb;
         vector<Bomb> bombs;
+        SoundBuffer bombplace_b;
+        Sound bombplace;
 
         Vector2f get_center_pos() {
             Vector2f size = collider.getSize();
@@ -148,7 +149,9 @@ class Player {
         }
 
     public:
-        Player() : down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f), isBomb(false) {
+        Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), right_frames(0.15f), isBomb(false) {
+            bombplace_b.loadFromFile("");
+            bombplace.setBuffer(bombplace_b);
             speed = 5.0f;
             bombcount = 1;
         }
@@ -253,15 +256,16 @@ class Player_one : public Player {
                     //sprite.move(speed, 0);
                 }
                 if (Keyboard::isKeyPressed(Keyboard::Space)) {
+
                     if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
 
                         Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
                         /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
-                        /* cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl; */
+                        cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
                         Vector2f bombPosition = map.get_coords(matrizIndex);
                         cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
                         Bomb newBomb(map, bombPosition);
-                        newBomb.destroy(map, map.get_mat_coords(position));
+                        newBomb.destroy(map, matrizIndex);
                         bombs.push_back(newBomb);
                         isBomb = true;
                     }
