@@ -76,7 +76,9 @@ class Player {
         virtual void controlar(Mapa_2&, RenderWindow& window, float& dt) = 0;
 
         void draw(RenderWindow& win) {
-            win.draw(sprite);
+            if(isAlive){
+                win.draw(sprite);
+            }
             /* win.draw(collider); */
         }
 
@@ -107,6 +109,7 @@ class Player_one : public Player {
 
     public:
         Player_one(Mapa_2& mapa, int WIDTH, int HEIGHT){
+            isAlive = true;
             position = mapa.get_coords(Vector2i(1,1));
             int blockSize = mapa.getBlockSize();
 
@@ -192,6 +195,8 @@ class Player_one : public Player {
                     if (!it->isAlive()) {
                         bombexplosion.play();
                         it->destroy(map);
+                        //this->isAlive = false;
+                        it->bombKill(collider.getGlobalBounds(), map, isAlive);
                         it = bombs.erase(it);
                         isBomb = false;
                     } else {

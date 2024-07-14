@@ -123,16 +123,42 @@ class Bomb{
         Vector2f collision(FloatRect playerCollider, Vector2f movement){
             FloatRect bombCollider = sprite.getGlobalBounds();
             if(playerCollider.intersects(bombCollider) && stayBomb == false){
-                cout<<"Chocando.."<<endl;
                 return Vector2f(-movement.x, -movement.y);
             } else if (playerCollider.intersects(bombCollider) && stayBomb == true) {
-                cout<<"Saliendo..."<<endl;
                 return Vector2f(0, 0);
             } else if (!playerCollider.intersects(bombCollider)){
-                cout<<"..."<<endl;
                 stayBomb = false;
                 return Vector2f(0, 0);
             }
         }
+
+        void bombKill(FloatRect playerCollider, Mapa_2 map, bool &isAlive){
+            for(int i=1; i<=radius; i++){
+                if ( m.y - i >= 0 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x, m.y - i)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+
+                if ( m.y + i <= 13 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x, m.y + i)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+
+                if ( m.x - i > 0 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x - i, m.y)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+
+                if ( m.x + i < 13 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x + i, m.y)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+            }
+        }
+
 };
 
