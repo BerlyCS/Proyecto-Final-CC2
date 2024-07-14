@@ -99,6 +99,8 @@ class Player {
                 }
             }
         }
+
+        RectangleShape getCollider() { return collider; }
 };
 
 class Player_one : public Player {
@@ -181,6 +183,9 @@ class Player_one : public Player {
                 }
                 move(movement);
                 checkCollision(map, movement);
+                if(!bombs.empty()){  // OJO solo esoty evaluando la colision de la primera bomba del Vector, cuando se agregue más bombas observar!!!!!!!!
+                    move(bombs[0].collision(collider.getGlobalBounds(), movement));
+                }
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
 
                 for (auto it = bombs.begin(); it != bombs.end();) {
@@ -200,8 +205,7 @@ class Player_one : public Player {
         
 };
 
-int WIDTH = 0;
-int HEIGHT = 0;
+
 
 int main() {
     //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);

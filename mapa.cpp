@@ -20,19 +20,9 @@ using namespace std;
 class Block{
     protected:
         Sprite sprite;
-        Texture texture;
-        IntRect frames[3];
         float sizeBlock;
     public:
-        Block(int WIDTH, int HEIGHT, int map_style=0){
-            texture.loadFromFile("images/wall_textur.png");
-            for(int i =0 ; i<3 ; i++) {
-                frames[2] = IntRect(0,16*map_style,16,16);
-                frames[1] = IntRect(16,16*map_style,16,16);
-                frames[0] = IntRect(32,16*map_style,16,16);
-            }
-            sprite.setTexture(texture);
-
+        Block(int WIDTH, int HEIGHT){
             int x = WIDTH;
             int y = HEIGHT;
             int min = x > y ? y : x;
@@ -43,8 +33,6 @@ class Block{
         Sprite& getSprite(){
             return sprite;
         }
-
-        Vector2i getSpriteSize() {return frames[0].getSize(); }
 
         void setSprite(Sprite& sprite) {
             this->sprite = sprite;
@@ -65,8 +53,7 @@ class Block{
 
 class Wall : public Block{
     public:
-        Wall(int WIDTH, int HEIGHT, int map_style) : Block(WIDTH, HEIGHT, map_style){
-            sprite.setTextureRect(frames[0]);
+        Wall(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
         }
 
         bool IsCollidable() {return true;}
@@ -77,8 +64,7 @@ class Wall : public Block{
 
 class WeakWall : public Block{
     public:
-        WeakWall(int WIDTH, int HEIGHT, int map_style) : Block(WIDTH, HEIGHT, map_style){
-            sprite.setTextureRect(frames[1]);
+        WeakWall(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT){
         }
 
         bool IsCollidable() {return true;}
@@ -112,9 +98,8 @@ class Fire_Tile : public Block {
 
 class Mapa_2 {
 private:
-    //Texture texture;
+    Texture texture;
     float sizeBlock;
-    int map_style;
     vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
     queue<Bomba*> bombsEvents;
@@ -127,20 +112,18 @@ public:
         texture.loadFromFile("images/wall_textur.png");
         IntRect frames[3];
 
-        /*
+        //
         for(int i =0 ; i<3 ; i++) {
             frames[2] = IntRect(0,16*map_style,16,16);
             frames[1] = IntRect(16,16*map_style,16,16);
             frames[0] = IntRect(32,16*map_style,16,16);
         }
-        */
-        this->map_style = map_style;
-        generador = new Creator();
 
         int x = WIDTH;
         int y = HEIGHT;
         int min = x > y ? y : x;
         sizeBlock = (float(min) / 13);
+        cout<<"sizeBlock: "<<sizeBlock<<endl;
 
         matriz = vector<vector<char>>(13, vector<char>(13, ' '));
         generarMatriz();
@@ -149,25 +132,20 @@ public:
             vector<Block*> filaSprites;
             for (int i = 0; i < 13; i++) {
                 Block* bloque;
-                //Sprite sprite;
-                //sprite.setTexture(texture);
+                Sprite sprite;
+                sprite.setTexture(texture);
                 if (matriz[i][j] == '#') {
-                    //bloque = new Wall(WIDTH, HEIGHT);
-                    //sprite.setTextureRect(frames[0]);
-                    bloque = generador->createWall(WIDTH, HEIGHT, map_style);
+                    bloque = new Wall(WIDTH, HEIGHT);
+                    sprite.setTextureRect(frames[0]);
                 } else if (matriz[i][j] == 'x') {
-                    //bloque = new WeakWall(WIDTH, HEIGHT);
-                    //sprite.setTextureRect(frames[1]);
-                    bloque = generador->createWeakWall(WIDTH, HEIGHT, map_style);
+                    bloque = new WeakWall(WIDTH, HEIGHT);
+                    sprite.setTextureRect(frames[1]);
                 } else {
-                    //bloque = new Tile(WIDTH, HEIGHT);
-                    //sprite.setTextureRect(frames[2]);
-                    bloque = generador->createTile(WIDTH, HEIGHT, map_style);
+                    bloque = new Tile(WIDTH, HEIGHT);
+                    sprite.setTextureRect(frames[2]);
                 }
-                //auto size = frames[0].getSize();
-                //bloque->setSprite(sprite);
-                //bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
-                auto size = bloque->getSpriteSize();
+                auto size = frames[0].getSize();
+                bloque->setSprite(sprite);
                 bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
                 bloque->getSprite().setPosition(sizeBlock * j, sizeBlock * i);
                 filaSprites.push_back(bloque);
@@ -278,11 +256,5 @@ public:
 
     int getBlockSize() {
         return sizeBlock;
-    }
-
-    void changeBlock(Vector2f index, int WIDTH, int HEIGHT){
-        Block* bloqueTile = generador->createTile(WIDTH, HEIGHT, map_style);
-        delete sprites_map[index.x][index.y];
-        sprites_map[index.x][index.y] = bloqueTile;
     }
 };
