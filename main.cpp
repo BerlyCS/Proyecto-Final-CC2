@@ -99,8 +99,7 @@ class Bomb{
         void destroy(Mapa_2 map, Vector2f matrizIndex) {
             if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){
                 cout<<"->"<<endl;
-                delete map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y];
-                map.getMatrizSprites()[matrizIndex.x+1][matrizIndex.y] = new Tile(1000,1000);
+                map.changeBlock(Vector2f(matrizIndex.x-1, matrizIndex.y), 1000, 1000);
             }
             
         }
@@ -228,7 +227,7 @@ class Player_one : public Player {
                         cout<<matrizIndex.x<<", "<<matrizIndex.y<<endl;
                         cout<<bombPosition.x<<", "<<bombPosition.y<<endl;
                         Bomb newBomb(bombPosition);
-                        //newBomb.destroy(map, map.get_coords(position));
+                        newBomb.destroy(map, map.get_coords(position));
                         bombs.push_back(newBomb);
                         isBomb = true;
                     }
@@ -254,14 +253,15 @@ class Player_one : public Player {
         
 };
 
-
+int WIDTH = 0;
+int HEIGHT = 0;
 
 int main() {
     //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "Bomberman");
     window.setVerticalSyncEnabled(true);
-    const int WIDTH = window.getSize().x;
-    const int HEIGHT = window.getSize().y;
+    WIDTH = window.getSize().x;
+    HEIGHT = window.getSize().y;
     Mapa_2 mapa(WIDTH, HEIGHT, 4);
     Menu menu;
     mapa.Print();
