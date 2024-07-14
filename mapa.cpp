@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cmath>
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -45,6 +46,9 @@ class Block{
         float getBlockSize() {return sizeBlock; }
 
         virtual bool IsCollidable() = 0;
+        virtual bool IsBreakable() = 0;
+
+        virtual ~Block() = default;
 };
 
 class Wall : public Block{
@@ -53,6 +57,9 @@ class Wall : public Block{
         }
 
         bool IsCollidable() {return true;}
+        bool IsBreakable() {return false;}
+
+        ~Wall() = default;
 };
 
 class WeakWall : public Block{
@@ -61,6 +68,9 @@ class WeakWall : public Block{
         }
 
         bool IsCollidable() {return true;}
+        bool IsBreakable() {return true;}
+
+        ~WeakWall() = default;
 };
 
 class Tile : public Block{
@@ -69,6 +79,21 @@ class Tile : public Block{
         }
 
         bool IsCollidable() {return false;}
+        bool IsBreakable() {return false;}
+        
+        ~Tile() = default;
+};
+
+class Fire_Tile : public Block {
+    public:
+        Fire_Tile(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT) {
+
+        }
+
+        bool IsCollidable() {return false;}
+        bool IsBreakable() {return false;
+        }
+        
 };
 
 class Mapa_2 {
@@ -78,9 +103,12 @@ private:
     vector< vector<Block*>> sprites_map;
     vector< vector<char>> matriz;
     queue<Bomba*> bombsEvents;
+    Vector2i screen_size;
+    int map_style;
 
 public:
-    Mapa_2(int WIDTH, int HEIGHT, int map_style=0) {
+    Mapa_2(int WIDTH, int HEIGHT, int map_style=0) : map_style(map_style) {
+        screen_size = Vector2i(WIDTH, HEIGHT);
         texture.loadFromFile("images/wall_textur.png");
         IntRect frames[3];
 
@@ -100,9 +128,9 @@ public:
         matriz = vector<vector<char>>(13, vector<char>(13, ' '));
         generarMatriz();
         // Inicializar sprites_map y matriz
-        for (int i = 0; i < 13; i++) {
+        for (int j = 0; j < 13; j++) {
             vector<Block*> filaSprites;
-            for (int j = 0; j < 13; j++) {
+            for (int i = 0; i < 13; i++) {
                 Block* bloque;
                 Sprite sprite;
                 sprite.setTexture(texture);
@@ -126,19 +154,53 @@ public:
         }
     }
 
-    /* Toma una coordenada del mapa y retorna la posicion en pantalla*/
-    Vector2f get_coords(int x, int y) {
-        cout<<x*sizeBlock<<' '<<y*sizeBlock<<endl;
-        return Vector2f(x*sizeBlock,y*sizeBlock);
+    void to_tile_at(Vector2i index) {
+        /* cout<<flush<<"Deleting: "<<index.x<<' '<<index.y<<' '<<sprites_map[index.x][index.y]<<endl; */
+        /* cout<<flush<<"deleting..."<<endl; */
+        /* delete sprites_map[index.y][index.x]; */
+        /* cout<<flush<<"deleted!"<<endl; */
+        /* cout<<flush<<"setting new tile..."<<endl; */
+        sprites_map[index.x][index.y] = new Tile(get_screen_size().x, get_screen_size().y);
+        Block* bloque = sprites_map[index.x][index.y];
+
+        /* cout<<flush<<"done..."<<endl; */
+
+        Sprite sprite;
+        sprite.setTexture(texture);
+        IntRect frames = IntRect(0,16*map_style,16,16);
+        sprite.setTextureRect(frames);
+
+        auto size = frames.getSize();
+        bloque->setSprite(sprite);
+        bloque->getSprite().setScale(sizeBlock/size.x, sizeBlock/size.y);
+        bloque->getSprite().setPosition(sizeBlock * index.x, sizeBlock * index.y);
     }
+
+    Vector2i get_screen_size() const {
+        return screen_size;
+    }
+
+    /* Toma una coordenada del mapa y retorna la posicion en pantalla*/
+    Vector2f get_coords(Vector2i pos) const {
+        /* cout<<x*sizeBlock<<' '<<y*sizeBlock<<endl; */
+        return Vector2f(pos.x*sizeBlock,pos.y*sizeBlock);
+    }
+
+    /* Vector2i get_coords(Vector2f pos) { */
+    /*     return Vector2i(pos.x/sizeBlock, pos.y/sizeBlock); */
+    /* } */
 
     /*Toma una coordenada de pantalla y retorna la posicion en la matriz*/
-    Vector2f get_coords(Vector2f pos) {
-        return Vector2f(pos.x/sizeBlock, pos.y/sizeBlock);
+    Vector2i get_mat_coords(Vector2f pos) {
+        return Vector2i((pos.x/sizeBlock), (pos.y/sizeBlock));
     }
 
-    Vector2i get_mat_coords(Vector2f pos) {
-        return Vector2i(pos.x/sizeBlock, pos.y/sizeBlock);
+    Block*& get_block_at(int x, int y) {
+        return sprites_map[x][y];
+    }
+
+    int get_map_style() {
+        return map_style;
     }
 
     void generarMatriz() {

@@ -1,5 +1,5 @@
 main:
-	g++ main.cpp -I/usr/include/ -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+	g++ main.cpp -I/usr/include/ -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -g3 -Wall -Wextra
 	./test.exe
 
 windows:
@@ -7,3 +7,6 @@ windows:
 
 bomb: 
 	g++ bomb.cpp -I/usr/include/ -o bomb -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+
+powerup: 
+	g++ powerup.cpp -I/usr/include/ -o powerup -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
