@@ -84,6 +84,18 @@ class Tile : public Block{
         ~Tile() = default;
 };
 
+class Fire_Tile : public Block {
+    public:
+        Fire_Tile(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT) {
+
+        }
+
+        bool IsCollidable() {return false;}
+        bool IsBreakable() {return false;
+        }
+        
+};
+
 class Mapa_2 {
 private:
     Texture texture;
