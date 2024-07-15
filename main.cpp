@@ -259,10 +259,37 @@ class Player_two : public Player {
                     right_frames.applyToSprite(sprite);
                     //sprite.move(speed, 0);
                 }
+                if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+
+                    if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
+                        Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
+                        bombplace.play();
+                        /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
+                        /* cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl; */
+                        Vector2f bombPosition = map.get_coords(matrizIndex);
+                        /* cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl; */
+                        bombs.push_back(Bomb(map, bombPosition, matrizIndex, bombpower));
+                        isBomb = true;
+                    }
+                }
+                for (auto& bomb : bombs) {
+                    bomb.update();
+                }
+                for (auto it = bombs.begin(); it != bombs.end();) {
+                    if (!it->isAlive()) {
+                        bombexplosion.play();
+                        it->destroy(map);
+                        it = bombs.erase(it);
+                        isBomb = false;
+                    } else {
+                        it->draw(window,dt);
+                        ++it;
+                    }
+                }
                 move(movement);
                 checkCollision(map, movement);
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
-                auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
+                /* auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition())); */
                 /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
             }
 };
