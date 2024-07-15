@@ -19,7 +19,8 @@
 #include "mapa.cpp"
 #include "menu.cpp"
 #include "animation.cpp"
-
+#include "bomba.cpp"
+#include <vector>
 //si encuentran una mejor implementacion pueden aplicarlo sobre lo
 //que ya esta
 
@@ -42,10 +43,13 @@ class Player {
         RectangleShape collider;
         int bombcount, bombpower, lives;
         bool isAlive;
+        vector<Bomba>& bombs;
+        bool bombPlaced;
     public:
-        Player() : down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f) {
+        Player(vector<Bomba>& bombs) : bombs(bombs), down_frames(0.2f), up_frames(0.2f), left_frames(0.2f), right_frames(0.2f) {
             speed = 5.0f;
             bombcount = 1;
+            bombpower = 1;
         }
     //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
         void move(Vector2f movement){
@@ -57,7 +61,7 @@ class Player {
 
 
         //para poder cambiar los controles
-        virtual void controlar(Mapa_2&, float&) = 0;
+        virtual void controlar(Mapa_2&, float&, Clock&) = 0;
 
         void draw(RenderWindow& win) {
             win.draw(sprite);
@@ -81,12 +85,12 @@ class Player {
                 }
             }
         }
-};
+    };
 
 class Player_one : public Player {
     public:
 
-        Player_one(Mapa_2& mapa) : Player() {
+        Player_one(Mapa_2& mapa, vector<Bomba>& bombs) : Player(bombs) {
             position = mapa.get_coords(1, 1);
             int blockSize = mapa.getBlockSize();
 
@@ -113,7 +117,7 @@ class Player_one : public Player {
 
             collider.setSize(Vector2f(blockSize-blockSize*0.15, blockSize- blockSize*0.15));
         }
-        void controlar(Mapa_2 &map, float& dt)
+        void controlar(Mapa_2 &map, float& dt, Clock& clock)
         {
                 down_frames.update(dt);
                 up_frames.update(dt);
@@ -149,6 +153,17 @@ class Player_one : public Player {
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
                 auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition()));
                 /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
+
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !bombPlaced){
+                    bombs.emplace_back(bombpower, 1, position, clock.getElapsedTime());
+                    bombPlaced = true;
+                }
+                for(auto& bomb:bombs){
+                    if(bomb.shouldExplode(clock.getElapsedTime())){
+                        bomb.explode();
+                        bombPlaced = false;
+                    }
+                }
             }
         
 };
@@ -166,8 +181,9 @@ int main() {
     mapa.Print();
     bool Game_started = true;
     Clock clock;
-
-    Player_one player(mapa);
+    
+    vector<Bomba> bombs;
+    Player_one player(mapa,bombs);
 
     while (window.isOpen()) {
         Event event;
@@ -185,12 +201,21 @@ int main() {
         }
         float dt = clock.restart().asSeconds();
         window.clear(Color::Black);
-        player.controlar(mapa, dt);
+        player.controlar(mapa, dt,clock);
         /* player_dos.controlar(mapa); */
         /* player_dos.controlar(); */
         mapa.draw(window);
         player.draw(window);
         /* player_dos.draw(window); */
+        Time elapsed=clock.getElapsedTime();
+        for(auto it=bombs.begin();it!=bombs.end();){
+            if(it->shouldExplode(elapsed)){
+                it=bombs.erase(it);
+            }else{
+                it->draw(window, elapsed.asSeconds());
+                it++;
+            }
+        }
         window.display();
     }
     return EXIT_SUCCESS;
