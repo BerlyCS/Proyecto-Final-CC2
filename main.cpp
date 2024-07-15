@@ -58,7 +58,7 @@ class Player {
             bombexplosion.setBuffer(bombexplosion_b);
             speed = 5.0f;
             bombcount = 1;
-            bombpower = 1;
+            bombpower = 5;
         }
 
     //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
@@ -127,7 +127,7 @@ class Player_one : public Player {
             right_frames.addFrame(IntRect(16,72,16,24));
             down_frames.applyToSprite(sprite);
 
-            collider.setSize(Vector2f(blockSize-blockSize*0.15, blockSize- blockSize*0.15));
+            collider.setSize(Vector2f(blockSize-blockSize*0.2, blockSize- blockSize*0.2));
         }
         void controlar(Mapa_2 &map, RenderWindow& window, float& dt)
         {
@@ -300,7 +300,7 @@ int main() {
     window.setVerticalSyncEnabled(true);
     const int WIDTH = window.getSize().x;
     const int HEIGHT = window.getSize().y;
-    Mapa_2 mapa(WIDTH, HEIGHT, 1);
+    Mapa_2 mapa(WIDTH, HEIGHT, 5);
     mapa.Print();
 
     Menu menu;
