@@ -3,8 +3,9 @@ main:
 	./test.exe
 
 windows:
-	g++ main.cpp -I D:\Libs\SFML-2.5.1\include -L D:\libs\SFML-2.5.1\lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -o p.exe
-
+	g++ main.cpp -o game.exe -L C:\Users\User\Documents\SFML\lib -I C:\Users\User\Documents\SFML\include -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+	game.exe
+	
 bomb: 
 	g++ bomb.cpp -I/usr/include/ -o bomb -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
