@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${vcpkgRoot}/x64-windows/include",
+                "C:\\Users\\User\\Documents\\SFML\\include\\"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "compilerArgs": [
+                "-L C:\\Users\\User\\Documents\\SFML\\lib ",
+                "-I C:\\Users\\User\\Documents\\SFML\\include ",
+                "-lsfml-graphics ",
+                "-lsfml-window ",
+                "-lsfml-system"
+            ]
+        }
+    ],
+    "version": 4
+}
