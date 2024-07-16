@@ -74,7 +74,9 @@ class Player {
         virtual void controlar(Mapa_2&, RenderWindow& window, float& dt) = 0;
 
         void draw(RenderWindow& win) {
-            win.draw(sprite);
+            if(isAlive){
+                win.draw(sprite);
+            }
             /* win.draw(collider); */
         }
 
@@ -97,12 +99,15 @@ class Player {
                 }
             }
         }
+
+        RectangleShape getCollider() { return collider; }
 };
 
 class Player_one : public Player {
 
     public:
         Player_one(Mapa_2& mapa, int WIDTH, int HEIGHT){
+            isAlive = true;
             position = mapa.get_coords(Vector2i(1,1));
             int blockSize = mapa.getBlockSize();
 
@@ -129,6 +134,85 @@ class Player_one : public Player {
 
             collider.setSize(Vector2f(blockSize-blockSize*0.2, blockSize- blockSize*0.2));
         }
+
+        void joystockControl(Mapa_2 &map, RenderWindow& window, float& dt)
+        {
+                down_frames.update(dt);
+                up_frames.update(dt);
+                left_frames.update(dt);
+                right_frames.update(dt);
+                Vector2f movement;
+
+                if(sf::Joystick::isConnected(0)){
+                    float xAxis = sf::Joystick::getAxisPosition(0, Joystick::X);
+                    float yAxis = sf::Joystick::getAxisPosition(0, Joystick::Y);
+                    Vector2f direction(xAxis, yAxis);
+                    if(xAxis > 0){
+                        right_frames.applyToSprite(sprite);
+                    }
+                    
+                    if(xAxis < 0){
+                        left_frames.applyToSprite(sprite);
+                    }
+
+                    if(yAxis > 0){
+                        down_frames.applyToSprite(sprite);
+                    }
+
+                    if(yAxis < 0){
+                        up_frames.applyToSprite(sprite);
+                    }
+
+                    float length = sqrt(direction.x * direction.x + direction.y * direction.y);
+                    
+                    if(length>0){
+                        direction /= length;
+                        movement = Vector2f(direction.x*speed, direction.y*speed);
+                    }
+                }
+
+                if (Joystick::isButtonPressed(0, 7)) {
+
+                    if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
+                        Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
+                        bombplace.play();
+                        /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
+                        cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
+                        Vector2f bombPosition = map.get_coords(matrizIndex);
+                        cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
+                        bombs.push_back(Bomb(map, bombPosition, matrizIndex, bombpower));
+                        isBomb = true;
+                    }
+                }
+
+                for (auto& bomb : bombs) {
+                    bomb.update();
+                }
+                move(movement);
+                checkCollision(map, movement);
+                if(!bombs.empty()){  // OJO solo esoty evaluando la colision de la primera bomba del Vector, cuando se agregue más bombas observar!!!!!!!!
+                    move(bombs[0].collision(collider.getGlobalBounds(), movement));
+                }
+                /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
+
+                for (auto it = bombs.begin(); it != bombs.end();) {
+                    if (!it->isAlive()) {
+                        bombexplosion.play();
+                        it->destroy(map);
+                        //this->isAlive = false;
+                        it->bombKill(collider.getGlobalBounds(), map, isAlive);
+                        it = bombs.erase(it);
+                        isBomb = false;
+                    } else {
+                        it->draw(window,dt);
+                        ++it;
+                    }
+                }
+                /* auto pos_mat = map.get_mat_coords(Vector2f(collider.getPosition())); */
+                /* cout<<pos_mat.x<<' '<<pos_mat.y<<endl; */
+            }
+
+
         void controlar(Mapa_2 &map, RenderWindow& window, float& dt)
         {
                 down_frames.update(dt);
@@ -179,12 +263,17 @@ class Player_one : public Player {
                 }
                 move(movement);
                 checkCollision(map, movement);
+                if(!bombs.empty()){  // OJO solo esoty evaluando la colision de la primera bomba del Vector, cuando se agregue más bombas observar!!!!!!!!
+                    move(bombs[0].collision(collider.getGlobalBounds(), movement));
+                }
                 /* cout<<sprite.getPosition().x<<' '<<sprite.getPosition().y<<endl; */
 
                 for (auto it = bombs.begin(); it != bombs.end();) {
                     if (!it->isAlive()) {
                         bombexplosion.play();
                         it->destroy(map);
+                        //this->isAlive = false;
+                        it->bombKill(collider.getGlobalBounds(), map, isAlive);
                         it = bombs.erase(it);
                         isBomb = false;
                     } else {
@@ -331,6 +420,7 @@ int main() {
         mapa.draw(window);
         player.controlar(mapa, window, dt);
         player2.controlar(mapa, window, dt);
+        //player.joystockControl(mapa, window, dt);
         /* player_dos.controlar(mapa); */
         /* player_dos.controlar(); */
         player.draw(window);

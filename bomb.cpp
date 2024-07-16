@@ -17,6 +17,8 @@ class Bomb{
         bool alive;
         int radius;
 
+        bool stayBomb; 
+
     public:
         Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius = 1) : frames(0.2f){
             //se establece el tamaño de la bomba al tamaño de un bloque del mapa
@@ -27,7 +29,7 @@ class Bomb{
             this->position = position;
             alive = true;
             lifeTimer.restart();
-
+            stayBomb = true;
             texture = make_unique<Texture>(Texture());
             texture->loadFromFile("images/bomb.png");
             sprite.setTexture(*texture);
@@ -117,5 +119,46 @@ class Bomb{
         Sprite& get_sprite() {
             return sprite;
         }
+
+        Vector2f collision(FloatRect playerCollider, Vector2f movement){
+            FloatRect bombCollider = sprite.getGlobalBounds();
+            if(playerCollider.intersects(bombCollider) && stayBomb == false){
+                return Vector2f(-movement.x, -movement.y);
+            } else if (playerCollider.intersects(bombCollider) && stayBomb == true) {
+                return Vector2f(0, 0);
+            } else if (!playerCollider.intersects(bombCollider)){
+                stayBomb = false;
+                return Vector2f(0, 0);
+            }
+        }
+
+        void bombKill(FloatRect playerCollider, Mapa_2 map, bool &isAlive){
+            for(int i=1; i<=radius; i++){
+                if ( m.y - i >= 0 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x, m.y - i)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+
+                if ( m.y + i <= 13 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x, m.y + i)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+
+                if ( m.x - i > 0 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x - i, m.y)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+
+                if ( m.x + i < 13 ) {
+                    if (playerCollider.intersects(map.get_block_at(m.x + i, m.y)->getSprite().getGlobalBounds())) {
+                        isAlive = false;
+                    }
+                }
+            }
+        }
+
 };
 
