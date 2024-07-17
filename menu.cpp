@@ -90,6 +90,7 @@ public:
 
     void draw(RenderWindow& window) {
         for (auto& button : buttons) {
+            window.clear();
             button.draw(window);
             window.display();
         }

@@ -50,8 +50,10 @@ class Facade_game {
             //eventos
             while (window.pollEvent(event)) {
                 //player.validadMovimiento(mapa.getMatriz());
-                if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
+                if (event.type == Event::Closed)
                     window.close();
+                if (event.type == Keyboard::isKeyPressed(Keyboard::Escape)) 
+                    Game_started = false;
             }
             if (!Game_started) {
                 menu.handleEvent(window, Game_started);
