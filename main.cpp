@@ -16,61 +16,75 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Audio.hpp>
 #include <cstdlib>
-#include <string>
-#include<iostream>
-#include "mapa.cpp"
 #include "mapa.h"
-#include "menu.cpp"
+#include "mapa.cpp"
 #include "animation.cpp"
+#include "menu.cpp"
+#include "animation.h"
 #include "player.h"
 
 using namespace sf;
 using namespace std;
 
+#define SCREEN_SIZE 600
+
+class Facade_game {
+    private:
+        sf::RenderWindow window;
+        Mapa_2 mapa;
+        Menu menu;
+        bool Game_started;
+        Clock clock;
+        Player_one player;
+        Player_two player2;
+        int WIDTH;
+        int HEIGHT;
+    public:
+        Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE) {
+            window.setVerticalSyncEnabled(true);
+            mapa.Print();
+            Game_started = false;
+        }
+
+        bool is_Running() {
+            return window.isOpen();
+        }
+
+        void update_game() {
+            Event event;
+            
+            //eventos
+            while (window.pollEvent(event)) {
+                //player.validadMovimiento(mapa.getMatriz());
+                if (event.type == Event::Closed)
+                    window.close();
+                if (event.type == Keyboard::isKeyPressed(Keyboard::Escape)) 
+                    Game_started = false;
+            }
+            if (!Game_started) {
+                menu.handleEvent(window, Game_started);
+                menu.draw(window);
+                return;
+            }
+            float dt = clock.restart().asSeconds();
+            window.clear(Color::Black);
+            mapa.draw(window);
+            player.controlar(mapa, window, dt);
+            player2.controlar(mapa, window, dt);
+            //player.joystockControl(mapa, window, dt);
+            /* player_dos.controlar(mapa); */
+            /* player_dos.controlar(); */
+            player.draw(window);
+            player2.draw(window);
+            /* player_dos.draw(window); */
+            window.display();
+        }
+};
+
 int main() {
-    //RenderWindow window(VideoMode::getFullscreenModes()[0], "Bomberman", Style::Fullscreen);
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Bomberman");
-    window.setVerticalSyncEnabled(true);
-    const int WIDTH = window.getSize().x;
-    const int HEIGHT = window.getSize().y;
-    Mapa_2 mapa(WIDTH, HEIGHT, 5);
-    mapa.Print();
-
-    Menu menu;
-
-    bool Game_started = true;
-
-    Clock clock;
-
-    Player_one player(mapa, WIDTH, HEIGHT);
-    Player_two player2(mapa);
-
-    while (window.isOpen()) {
-        Event event;
-        
-        //eventos
-        while (window.pollEvent(event)) {
-            //player.validadMovimiento(mapa.getMatriz());
-            if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
-                window.close();
-        }
-        if (!Game_started) {
-            menu.handleEvent(window, Game_started);
-            menu.draw(window);
-            continue;
-        }
-        float dt = clock.restart().asSeconds();
-        window.clear(Color::Black);
-        mapa.draw(window);
-        player.controlar(mapa, window, dt);
-        player2.controlar(mapa, window, dt);
-        //player.joystockControl(mapa, window, dt);
-        /* player_dos.controlar(mapa); */
-        /* player_dos.controlar(); */
-        player.draw(window);
-        player2.draw(window);
-        /* player_dos.draw(window); */
-        window.display();
+    Facade_game game;
+    while (game.is_Running()) {
+        game.update_game();
     }
     return EXIT_SUCCESS;
 }

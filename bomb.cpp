@@ -62,7 +62,7 @@ void Bomb::destroy(Mapa_2 &map) {
             }
         }
         //down tiles
-        if ( m.y + i <= 13 ) {
+        if ( m.y + i < 13 ) {
             if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y + i);
                 map.to_tile_at(Vector2i(m.x,m.y + i));
@@ -119,7 +119,7 @@ void Bomb::bombKill(FloatRect playerCollider, Mapa_2 map, bool &isAlive){
             }
         }
 
-        if ( m.y + i <= 13 ) {
+        if ( m.y + i < 13 ) {
             if (playerCollider.intersects(map.get_block_at(m.x, m.y + i)->getSprite().getGlobalBounds())) {
                 isAlive = false;
 
