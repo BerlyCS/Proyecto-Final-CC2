@@ -26,7 +26,7 @@
 using namespace sf;
 using namespace std;
 
-#define SCREEN_SIZE 600
+#define SCREEN_SIZE 1000
 
 class Facade_game {
     private:
@@ -43,7 +43,7 @@ class Facade_game {
         Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE) {
             window.setVerticalSyncEnabled(true);
             mapa.Print();
-            Game_started = false;
+            Game_started = true;
         }
 
         bool is_Running() {
@@ -56,7 +56,7 @@ class Facade_game {
             //eventos
             while (window.pollEvent(event)) {
                 //player.validadMovimiento(mapa.getMatriz());
-                if (event.type == Event::Closed)
+                if (event.type == Event::Closed || event.type == Keyboard::isKeyPressed(Keyboard::Escape))
                     window.close();
                 if (event.type == Keyboard::isKeyPressed(Keyboard::Escape)) 
                     Game_started = false;
