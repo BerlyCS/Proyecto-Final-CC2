@@ -49,6 +49,12 @@ void Player::checkCollision(Mapa_2& map, Vector2f movement){
             }
         }
     }
+
+    if(!bombs.empty()){
+        for(auto &bomb: bombs){
+            move(bomb.collision(collider.getGlobalBounds(), movement));
+        }
+    }
 }
 
 

@@ -102,10 +102,13 @@ Sprite& Bomb::get_sprite() {
 Vector2f Bomb::collision(FloatRect playerCollider, Vector2f movement){
     FloatRect bombCollider = sprite.getGlobalBounds();
     if(playerCollider.intersects(bombCollider) && stayBomb == false){
+        cout<<"Chocando..."<<endl;
         return Vector2f(-movement.x, -movement.y);
     } else if (playerCollider.intersects(bombCollider) && stayBomb == true) {
+        cout<<"Dentro bomba"<<endl;
         return Vector2f(0, 0);
     } else if (!playerCollider.intersects(bombCollider)){
+        cout<<"Fuera de la bomba"<<endl;
         stayBomb = false;
         return Vector2f(0, 0);
     }
