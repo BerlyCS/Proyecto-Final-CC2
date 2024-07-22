@@ -20,13 +20,13 @@ void Player::move(Vector2f movement){
     position += movement;
     sprite.setPosition(position);
 
-    collider.setPosition(Vector2f(position.x, position.y + sprite.getGlobalBounds().height*0.45));
+    collider.setPosition(Vector2f(position.x+8, position.y + sprite.getGlobalBounds().height*0.45));
     collider.setFillColor(Color::Red);
 }
 
  void Player::draw(RenderWindow& win) {
     win.draw(sprite);
-    /* win.draw(collider); */
+    /*win.draw(collider);*/
 }
 
 Sprite Player::getSprite(){
