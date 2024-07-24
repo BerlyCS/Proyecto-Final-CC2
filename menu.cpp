@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -48,11 +49,11 @@ public:
     void draw(RenderWindow& window) {
         Vector2i mousePos = Mouse::getPosition(window);
         if (block.getGlobalBounds().contains(static_cast<Vector2f>(mousePos))) {
-            block.setFillColor(Color(50,50,50));
+            block.setFillColor(Color(50,50,50,100));
             sound.play();
         }
         else {
-            block.setFillColor(Color(100,100,100));
+            block.setFillColor(Color(100,100,100,100));
         }
         window.draw(block);
         window.draw(text);
@@ -67,13 +68,22 @@ class Menu {
 private:
     std::vector<Button> buttons;
     Font font;
+    Texture backgroundTexture;
+    Sprite backgroundSprite;
 public:
     Menu() {
         if (!font.loadFromFile("font.ttf")) {
-            std::cout<<"Error al cargar la fuente"<<std::endl;
+            std::cout << "Error al cargar font-ttf" << std::endl;
         }
-        buttons.push_back(Button(Vector2f(100, 100), "Start", font, 40));
-        buttons.push_back(Button(Vector2f(100, 200), "Exit", font, 40));
+        if (!backgroundTexture.loadFromFile("images/bg.jpg")) {
+            std::cout << "Error al cargar bg" << std::endl;
+        }
+        backgroundSprite.setTexture(backgroundTexture);
+        auto size = backgroundTexture.getSize();
+        backgroundSprite.scale(float(1000)/size.x, float(1000)/size.y);
+
+        buttons.push_back(Button(Vector2f(100, 100), "Start", font, 50));
+        buttons.push_back(Button(Vector2f(100, 200), "Exit", font, 50));
     }
 
     void handleEvent(RenderWindow& window, bool& Game_started) {
@@ -89,35 +99,15 @@ public:
     }
 
     void draw(RenderWindow& window) {
+        window.clear(); 
+
+        window.draw(backgroundSprite);
+
         for (auto& button : buttons) {
-            window.clear();
             button.draw(window);
-            window.display();
         }
+
+        window.display();
     }
 };
 
-/* int main() { */
-/*     // Crear una ventana */
-/*     sf::RenderWindow window(sf::VideoMode(800, 600), "Imprimir Texto en SFML"); */
-/*     window.setFramerateLimit(60); */
-
-/*     Menu menu; */
-
-/*     while (window.isOpen()) { */
-/*         sf::Event event; */
-/*         while (window.pollEvent(event)) { */
-/*             if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { */
-/*                 window.close(); */
-/*             } */
-/*         } */
-
-/*         menu.handleEvent(window); */
-
-/*         window.clear(); // Limpiar la ventana */
-/*         menu.draw(window); */
-/*         window.display(); // Mostrar el contenido en la ventana */
-/*     } */
-
-/*     return 0; */
-/* } */
