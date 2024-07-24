@@ -196,7 +196,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
             bombplace.play();
-            /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
+            //cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl;
             cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
             Vector2f bombPosition = map.get_coords(matrizIndex);
             cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
