@@ -9,12 +9,10 @@
 using namespace sf;
 using namespace std;
 
-class IPlayer{
-    virtual void collisionBomb(Vector2f) = 0;
-};
-
-class Player : public IPlayer {
+class Player {
     protected:
+        static vector<FloatRect> bombasColliders;
+
         Texture texture;
         ASprite down_frames, up_frames, left_frames, right_frames;
         Sprite sprite;
@@ -46,7 +44,6 @@ class Player : public IPlayer {
         Sprite getSprite();
         void checkCollision(Mapa_2& map, Vector2f movement);
         RectangleShape getCollider();
-        void collisionBomb(Vector2f) override;
 };
 
 class Player_one : public Player {

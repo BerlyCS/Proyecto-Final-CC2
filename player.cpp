@@ -5,6 +5,8 @@
 using namespace sf;
 using namespace std;
 
+vector<FloatRect> Player::bombasColliders;
+
 Player::Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), right_frames(0.15f), isBomb(false) {
     bombplace_b.loadFromFile("26.wav");
     bombplace.setBuffer(bombplace_b);
@@ -50,15 +52,13 @@ void Player::checkCollision(Mapa_2& map, Vector2f movement){
         }
     }
 
-    if(!bombs.empty()){
-        for(auto &bomb: bombs){
-            move(bomb.collision(collider.getGlobalBounds(), movement));
+    if(!bombasColliders.empty()){
+        for(auto &bomb: bombasColliders){
+            if(playerBounds.intersects(bomb)){
+                move(-movement);
+            }
         }
     }
-}
-
-void Player::collisionBomb(Vector2f position) {
-    cout<<"Bomba detectada en: "<<position.x<<", "<<position.y<<endl;
 }
 
 
@@ -205,6 +205,8 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
             Vector2f bombPosition = map.get_coords(matrizIndex);
             cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl;
             bombs.push_back(Bomb(map, bombPosition, matrizIndex, bombpower));
+            int last = bombs.size();
+            bombasColliders.push_back(bombs[last-1].get_sprite().getGlobalBounds());
             isBomb = true;
         }
     }
@@ -221,6 +223,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
             bombexplosion.play();
             it->destroy(map);
             it = bombs.erase(it);
+            bombasColliders.pop_back();
             isBomb = false;
         } else {
             it->draw(window,dt);
