@@ -1,4 +1,6 @@
 #include "sound.hpp"
+#include <cstdlib>
+#include <ctime>
 
 sf::SoundBuffer Sound_Singleton::bombexplosion_b;
 sf::SoundBuffer Sound_Singleton::bombplace_b;
@@ -47,6 +49,11 @@ void Sound_Singleton::play_battle_1() {
 
 void Sound_Singleton::play_battle_2() {
     battle_theme2.play();
+}
+
+void Sound_Singleton::play_rand_battle() {
+    srand(time(nullptr));
+    rand()%2 ? battle_theme1.play() : battle_theme2.play();
 }
 
 void Sound_Singleton::play_bombexplosion() {

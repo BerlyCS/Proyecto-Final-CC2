@@ -104,8 +104,6 @@ class Facade_game {
             float dt = clock.restart().asSeconds();
             window.clear(Color::Black);
             mapa.draw(window);
-            player.check_deaths(mapa);
-            player2.check_deaths(mapa);
             player.controlar(mapa, window, dt);
             player2.controlar(mapa, window, dt);
             //player.joystockControl(mapa, window, dt);
@@ -125,6 +123,8 @@ class Facade_game {
                 this_thread::sleep_for(chrono::seconds(3));
                 window.close();
             }
+            player.check_deaths(mapa);
+            player2.check_deaths(mapa);
             /* player_dos.draw(window); */
             window.display();
         }

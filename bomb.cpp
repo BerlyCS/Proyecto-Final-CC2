@@ -56,6 +56,7 @@ Vector2f Bomb::getPosition() const {
 void Bomb::destroy(Mapa_2 &map) {
     bool up=true,down=true,right=true,left=true;
     for (int i = 1; i<=radius; i++) {
+        map.insertFire(m, 1);
         //up tiles
         if ( m.y - i >= 0 && up ) {
             if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {

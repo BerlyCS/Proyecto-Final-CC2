@@ -14,6 +14,7 @@ class Sound_Singleton {
         static void play_battle_1();
         static void play_battle_2();
         static void play_bombexplosion();
+        static void play_rand_battle();
         static void play_bombplace();
         static void play_powerup();
         static void play_menu_theme();
