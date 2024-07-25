@@ -1,7 +1,9 @@
 #include "mapa.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <memory>
+#include <vector>
 
 using namespace sf;
 using namespace std;
@@ -85,6 +87,9 @@ void FireTile::draw(RenderWindow& window) {
             window.draw(fireSprite);
         }
     }
+FloatRect FireTile::get_rect() {
+    return fireSprite.getGlobalBounds();
+}
 
 Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
     screen_size = Vector2i(WIDTH, HEIGHT);
@@ -225,7 +230,7 @@ void Mapa_2::draw(RenderWindow& window) {
 
     for (auto it = fire.begin(); it != fire.end(); it++) {
         if (it->isExpired()) {
-            continue;
+            /* fire.erase(it); */
         }
         else {
             it->draw(window);
@@ -248,5 +253,9 @@ int Mapa_2::getBlockSize() {
 void Mapa_2::insertFire(Vector2i pos, int dir) {
     auto coords = get_coords(pos);
     fire.push_back(FireTile(coords,dir,sizeBlock));
+}
+
+vector<FireTile>& Mapa_2::getFire() {
+    return fire;
 }
 

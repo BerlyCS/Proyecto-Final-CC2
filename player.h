@@ -30,6 +30,7 @@ class Player {
 
     public:
         Player();
+        void check_deaths(Mapa_2& map);
     //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
         void move(Vector2f movement);
         //para poder cambiar los controles
@@ -38,6 +39,8 @@ class Player {
         Sprite getSprite();
         void checkCollision(Mapa_2& map, Vector2f movement);
         RectangleShape getCollider();
+        bool alive();
+        void kill();
 };
 
 class Player_one : public Player {

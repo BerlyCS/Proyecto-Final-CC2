@@ -68,6 +68,7 @@ public:
     FireTile(Vector2f&, int, float); 
     bool isExpired() const;
     void draw(RenderWindow& window);
+    FloatRect get_rect();
 };
 
 class Mapa_2 {
@@ -96,5 +97,6 @@ public:
     vector<vector<Block*>> getMatrizSprites();
     int getBlockSize();
     void insertFire(Vector2i pos, int dir);
+    vector<FireTile>& getFire();
 };
 

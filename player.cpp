@@ -1,5 +1,6 @@
 #pragma once
 #include "player.h"
+#include "mapa.h"
 #include "sound.hpp"
 #include <SFML/Graphics.hpp>
 
@@ -11,6 +12,23 @@ Player::Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), rig
     speed = 5.0f;
     bombcount = 1;
     bombpower = 2;
+    isAlive=true;
+}
+
+void Player::check_deaths(Mapa_2& map) {
+    for (auto it = map.getFire().begin(); it != map.getFire().end(); it++) {
+        if (it->get_rect().intersects(collider.getGlobalBounds()) && !it->isExpired()) {
+            isAlive = false;
+        }
+    }
+}
+
+bool Player::alive() {
+    return isAlive;
+}
+
+void Player::kill() {
+    isAlive = false;
 }
 
 //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!

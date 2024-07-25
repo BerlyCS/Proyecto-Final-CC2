@@ -15,7 +15,9 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Audio.hpp>
+#include <chrono>
 #include <cstdlib>
+#include <thread>
 #include "mapa.h"
 #include "mapa.cpp"
 #include "animation.cpp"
@@ -65,7 +67,7 @@ class Facade_game {
                     Game_started = false;
                 } 
 
-                if (event.type == sf::Event::KeyPressed) {
+/*              if (event.type == sf::Event::KeyPressed) {
                     switch (event.key.code) {
                         case sf::Keyboard::Num1:
                             Sound_Singleton::play_battle_1();
@@ -88,7 +90,7 @@ class Facade_game {
                         default:
                             break;
                     }
-                }                
+                }*/            
             }
             if (!Game_started) {
                 menu.handleEvent(window, Game_started);
@@ -98,13 +100,27 @@ class Facade_game {
             float dt = clock.restart().asSeconds();
             window.clear(Color::Black);
             mapa.draw(window);
+            player.check_deaths(mapa);
+            player2.check_deaths(mapa);
             player.controlar(mapa, window, dt);
             player2.controlar(mapa, window, dt);
             //player.joystockControl(mapa, window, dt);
             /* player_dos.controlar(mapa); */
             /* player_dos.controlar(); */
-            player.draw(window);
-            player2.draw(window);
+            if (player.alive()) 
+                player.draw(window);
+            else {
+                cout<<"gano jugador 2"<<endl;
+                this_thread::sleep_for(chrono::seconds(3));
+                window.close();
+            }
+            if (player2.alive())
+                player2.draw(window);
+            else {
+                cout<<"gano jugador 1"<<endl;
+                this_thread::sleep_for(chrono::seconds(3));
+                window.close();
+            }
             /* player_dos.draw(window); */
             window.display();
         }
