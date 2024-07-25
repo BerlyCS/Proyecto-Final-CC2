@@ -1,5 +1,6 @@
 #include "bomb.h"
 #include "mapa.h"
+#include <SFML/System/Vector2.hpp>
 
 Bomb::Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius) : frames(0.2f){
     //se establece el tamaño de la bomba al tamaño de un bloque del mapa
@@ -22,6 +23,8 @@ Bomb::Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius) : frame
 
     this->radius = radius; //radius 1
     this->m = mat_pos;
+
+    this->type=0;
 }
 
 bool Bomb::isAlive() const {
@@ -29,7 +32,7 @@ bool Bomb::isAlive() const {
 }
 
 void Bomb::update() {
-    if (lifeTimer.getElapsedTime().asSeconds() >= 2.0) {
+    if (lifeTimer.getElapsedTime().asSeconds() >= 3.0) {
         alive = false;
     }
 }
@@ -50,37 +53,64 @@ Vector2f Bomb::getPosition() const {
     return center_pos;
 }
 
-//Por alguna razon se borran los objetos en
-//con las coordenadas invertidas
 void Bomb::destroy(Mapa_2 &map) {
+    bool up=true,down=true,right=true,left=true;
     for (int i = 1; i<=radius; i++) {
         //up tiles
-        if ( m.y - i >= 0 ) {
+        if ( m.y - i >= 0 && up ) {
             if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y - i);
                 map.to_tile_at(Vector2i(m.x,m.y - i));
-            }
+                up=false;
+                map.insertFire(Vector2i(m.x, m.y - i), 1);
+            } else if ( map.get_block_at(m.x, m.y - i)->IsCollidable()){
+                up = false;
+            } else {
+                map.insertFire(Vector2i(m.x, m.y - i), 1);
+            } 
+            
         }
         //down tiles
-        if ( m.y + i < 13 ) {
+        if ( m.y + i < 13 && down) {
             if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y + i);
                 map.to_tile_at(Vector2i(m.x,m.y + i));
-            }
+                map.insertFire(Vector2i(m.x, m.y + i), 1);
+                down=false;
+            } else  if ( map.get_block_at(m.x, m.y + i)->IsCollidable() ){
+                down= false;
+            } else {
+                map.insertFire(Vector2i(m.x, m.y + i), 1);
+            } 
+            
         }
         //left tiles
-        if ( m.x - i > 0 ) {
+        if ( m.x - i > 0 && left ) {
             if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x - i, m.y);
                 map.to_tile_at(Vector2i(m.x - i,m.y));
-            }
+                map.insertFire(Vector2i(m.x - i, m.y), 0);
+                left=false;
+            } else  if (map.get_block_at(m.x - i, m.y)->IsCollidable() ){
+                left = false;
+            } else { 
+                map.insertFire(Vector2i(m.x - i, m.y), 0);
+            } 
+            
         }
         //right tiles
-        if ( m.x + i < 13 ) {
+        if ( m.x + i < 13  && right) {
             if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x+i, m.y);
                 map.to_tile_at(Vector2i(m.x+i,m.y ));
-            }
+                map.insertFire(Vector2i(m.x + i, m.y), 0);
+                right=false;
+            }else if ( map.get_block_at(m.x + i, m.y)->IsCollidable() ){
+                right = false;
+            } else {
+
+                map.insertFire(Vector2i(m.x + i, m.y), 0);
+            } 
         }
     }
     /* if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){

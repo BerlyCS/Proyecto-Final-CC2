@@ -1,4 +1,7 @@
+#pragma once
 #include "player.h"
+#include "mapa.h"
+#include "sound.hpp"
 #include <SFML/Graphics.hpp>
 
 
@@ -8,13 +11,26 @@ using namespace std;
 vector<FloatRect> Player::bombasColliders;
 
 Player::Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), right_frames(0.15f), isBomb(false) {
-    bombplace_b.loadFromFile("26.wav");
-    bombplace.setBuffer(bombplace_b);
-    bombexplosion_b.loadFromFile("27.wav");
-    bombexplosion.setBuffer(bombexplosion_b);
     speed = 5.0f;
     bombcount = 1;
-    bombpower = 5;
+    bombpower = 2;
+    isAlive=true;
+}
+
+void Player::check_deaths(Mapa_2& map) {
+    for (auto it = map.getFire().begin(); it != map.getFire().end(); it++) {
+        if (it->get_rect().intersects(collider.getGlobalBounds()) && !it->isExpired()) {
+            isAlive = false;
+        }
+    }
+}
+
+bool Player::alive() {
+    return isAlive;
+}
+
+void Player::kill() {
+    isAlive = false;
 }
 
 //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
@@ -149,7 +165,7 @@ void Player_one::joystockControl(Mapa_2 &map, RenderWindow& window, float& dt)
 
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
-            bombplace.play();
+            Sound_Singleton::play_bombplace();
             /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
             cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
             Vector2f bombPosition = map.get_coords(matrizIndex);
@@ -171,7 +187,7 @@ void Player_one::joystockControl(Mapa_2 &map, RenderWindow& window, float& dt)
 
     for (auto it = bombs.begin(); it != bombs.end();) {
         if (!it->isAlive()) {
-            bombexplosion.play();
+            Sound_Singleton::play_bombexplosion();
             it->destroy(map);
             //this->isAlive = false;
             it->bombKill(collider.getGlobalBounds(), map, isAlive);
@@ -219,7 +235,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
     if (Keyboard::isKeyPressed(Keyboard::Space)) {
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
-            bombplace.play();
+            Sound_Singleton::play_bombplace();
             //cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl;
             cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
             Vector2f bombPosition = map.get_coords(matrizIndex);
@@ -240,7 +256,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
 
     for (auto it = bombs.begin(); it != bombs.end();) {
         if (!it->isAlive()) {
-            bombexplosion.play();
+            Sound_Singleton::play_bombexplosion();
             it->destroy(map);
             it = bombs.erase(it);
             bombasColliders.pop_back();
@@ -317,7 +333,7 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
 
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
-            bombplace.play();
+            Sound_Singleton::play_bombplace();
             /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
             /* cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl; */
             Vector2f bombPosition = map.get_coords(matrizIndex);
@@ -333,7 +349,7 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
     }
     for (auto it = bombs.begin(); it != bombs.end();) {
         if (!it->isAlive()) {
-            bombexplosion.play();
+            Sound_Singleton::play_bombexplosion();
             it->destroy(map);
             it = bombs.erase(it);
             bombasColliders.pop_back();

@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
+#include <memory>
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -57,13 +58,19 @@ class Tile : public Block{
         ~Tile() = default;
 };
 
-class Fire_Tile : public Block {
-    public:
-        Fire_Tile(int WIDTH, int HEIGHT);
-
-        bool IsCollidable();
-        bool IsBreakable();
+class FireTile {
+private:
+    Sprite fireSprite;
+    static Texture fireTexture;
+    Clock timer;
+    float duration;
+public:
+    FireTile(Vector2f&, int, float); 
+    bool isExpired() const;
+    void draw(RenderWindow& window);
+    FloatRect get_rect();
 };
+
 class Mapa_2 {
 private:
     Texture texture;
@@ -73,6 +80,7 @@ private:
     queue<Bomb*> bombsEvents;
     Vector2i screen_size;
     int map_style;
+    vector<FireTile> fire;
 
 public:
     Mapa_2(int WIDTH, int HEIGHT, int map_style=0);
@@ -88,5 +96,7 @@ public:
     vector<vector<char>> getMatriz();
     vector<vector<Block*>> getMatrizSprites();
     int getBlockSize();
+    void insertFire(Vector2i pos, int dir);
+    vector<FireTile>& getFire();
 };
 

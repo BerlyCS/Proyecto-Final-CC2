@@ -11,7 +11,10 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <cstdlib>
 #include <iostream>
+#include "sound.cpp"
+#include "sound.hpp"
 
 using namespace sf;
 
@@ -19,8 +22,6 @@ class Button {
 private:
     RectangleShape block;
     Text text;
-    SoundBuffer buffer;
-    Sound sound;
 public:
     Button(Vector2f pos, std::string textStr, Font& font, int textSize, int margin = 5) : 
      text(textStr,font,textSize){
@@ -33,9 +34,7 @@ public:
         block.setFillColor(Color(100, 100, 100));
         block.setPosition(Vector2f(pos.x-5, pos.y-5));
 
-        buffer.loadFromFile("2.wav");
-        sound.setBuffer(buffer);
-        sound.play();
+        /* sound.play(); */
     }
 
     bool isClicked(RenderWindow& window) {
@@ -50,7 +49,7 @@ public:
         Vector2i mousePos = Mouse::getPosition(window);
         if (block.getGlobalBounds().contains(static_cast<Vector2f>(mousePos))) {
             block.setFillColor(Color(50,50,50,100));
-            sound.play();
+            /* sound.play(); */
         }
         else {
             block.setFillColor(Color(100,100,100,100));
@@ -71,7 +70,8 @@ private:
     Texture backgroundTexture;
     Sprite backgroundSprite;
 public:
-    Menu() {
+    Menu(int SCREEN_SIZE) {
+        Sound_Singleton::play_menu_theme();
         if (!font.loadFromFile("font.ttf")) {
             std::cout << "Error al cargar font-ttf" << std::endl;
         }
@@ -80,7 +80,7 @@ public:
         }
         backgroundSprite.setTexture(backgroundTexture);
         auto size = backgroundTexture.getSize();
-        backgroundSprite.scale(float(1000)/size.x, float(1000)/size.y);
+        backgroundSprite.scale(float(SCREEN_SIZE)/size.x, float(SCREEN_SIZE)/size.y);
 
         buttons.push_back(Button(Vector2f(100, 100), "Start", font, 50));
         buttons.push_back(Button(Vector2f(100, 200), "Exit", font, 50));
@@ -90,6 +90,9 @@ public:
         for (auto& button : buttons) {
             if (button.isClicked(window)) {
                 if (button.getText() == "Start") {
+                    Sound_Singleton::stop_menu();
+                    srand(10); 
+                    rand()%2 ? Sound_Singleton::play_battle_1() : Sound_Singleton::play_battle_2();
                     Game_started = true;
                 } else if (button.getText() == "Exit") {
                     window.close();

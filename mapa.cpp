@@ -1,4 +1,9 @@
 #include "mapa.h"
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <memory>
+#include <vector>
 
 using namespace sf;
 using namespace std;
@@ -57,16 +62,34 @@ bool Tile::IsBreakable(){
     return false;
 }
 
+Texture FireTile::fireTexture = Texture();
 
-Fire_Tile::Fire_Tile(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT) {}
+FireTile::FireTile(Vector2f& position, int direction, float size) : duration(0.5f) {
+    //direction 
+    //0=horiontal
+    //1=vertical
+    //
+        /* fireTexture = make_shared<Texture>(Texture()); */
+        fireTexture.loadFromFile("images/fire.png");
+        fireSprite.setTexture(fireTexture);
+        fireSprite.setTextureRect(IntRect(16*direction,0, 16,16));
+        fireSprite.setPosition(position);
+        fireSprite.setScale(float(size)/16.0f, size/16.0f);
+        timer.restart();
+    }
 
-bool Fire_Tile::IsCollidable(){
-    return false;
+bool FireTile::isExpired() const {
+        return timer.getElapsedTime().asSeconds() >= duration;
+    }
+
+void FireTile::draw(RenderWindow& window) {
+        if (!isExpired()) {
+            window.draw(fireSprite);
+        }
+    }
+FloatRect FireTile::get_rect() {
+    return fireSprite.getGlobalBounds();
 }
-bool Fire_Tile::IsBreakable(){
-    return false;
-}
-
 
 Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
     screen_size = Vector2i(WIDTH, HEIGHT);
@@ -204,6 +227,15 @@ void Mapa_2::draw(RenderWindow& window) {
             sprites_map[i][j]->draw(window);
         }
     }
+
+    for (auto it = fire.begin(); it != fire.end(); it++) {
+        if (it->isExpired()) {
+            /* fire.erase(it); */
+        }
+        else {
+            it->draw(window);
+        }
+    }
 }
 
 vector<vector<char>> Mapa_2::getMatriz(){
@@ -217,3 +249,13 @@ vector<vector<Block*>> Mapa_2::getMatrizSprites(){
 int Mapa_2::getBlockSize() {
     return sizeBlock;
 }
+
+void Mapa_2::insertFire(Vector2i pos, int dir) {
+    auto coords = get_coords(pos);
+    fire.push_back(FireTile(coords,dir,sizeBlock));
+}
+
+vector<FireTile>& Mapa_2::getFire() {
+    return fire;
+}
+
