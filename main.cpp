@@ -29,7 +29,7 @@ using namespace std;
 
 class Facade_game {
     private:
-        sf::RenderWindow window;
+        RenderWindow window;
         Mapa_2 mapa;
         Menu menu;
         bool Game_started;
@@ -39,7 +39,7 @@ class Facade_game {
         int WIDTH;
         int HEIGHT;
     public:
-        Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE) {
+        Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE), menu(SCREEN_SIZE) {
             window.setVerticalSyncEnabled(true);
             mapa.Print();
             Game_started = true;
@@ -80,7 +80,7 @@ class Facade_game {
         }
 };
 
-int main() {
+int main(int argc, char* argv[]) {
     Facade_game game;
     while (game.is_Running()) {
         game.update_game();

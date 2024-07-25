@@ -12,7 +12,7 @@ Player::Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), rig
     bombexplosion.setBuffer(bombexplosion_b);
     speed = 5.0f;
     bombcount = 1;
-    bombpower = 5;
+    bombpower = 2;
 }
 
 //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!

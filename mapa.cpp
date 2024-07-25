@@ -58,15 +58,22 @@ bool Tile::IsBreakable(){
 }
 
 
-Fire_Tile::Fire_Tile(int WIDTH, int HEIGHT) : Block(WIDTH, HEIGHT) {}
+FireTile::FireTile(string& textureFile, Vector2f& position, float fireDuration) 
+        : duration(fireDuration) {
+        fireSprite.setTexture(fireTexture);
+        fireSprite.setPosition(position);
+        timer.restart();
+    }
 
-bool Fire_Tile::IsCollidable(){
-    return false;
-}
-bool Fire_Tile::IsBreakable(){
-    return false;
-}
+bool FireTile::isExpired() const {
+        return timer.getElapsedTime().asSeconds() >= duration;
+    }
 
+void FireTile::draw(RenderWindow& window) {
+        if (!isExpired()) {
+            window.draw(fireSprite);
+        }
+    }
 
 Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
     screen_size = Vector2i(WIDTH, HEIGHT);
