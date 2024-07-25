@@ -57,6 +57,10 @@ void Player::checkCollision(Mapa_2& map, Vector2f movement){
     }
 }
 
+void Player::collisionBomb(Vector2f position) {
+    cout<<"Bomba detectada en: "<<position.x<<", "<<position.y<<endl;
+}
+
 
 Player_one::Player_one(Mapa_2& mapa, int WIDTH, int HEIGHT){
     position = mapa.get_coords(Vector2i(1,1));
