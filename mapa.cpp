@@ -1,4 +1,7 @@
 #include "mapa.h"
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <memory>
 
 using namespace sf;
 using namespace std;
@@ -58,10 +61,18 @@ bool Tile::IsBreakable(){
 }
 
 
-FireTile::FireTile(string& textureFile, Vector2f& position, float fireDuration) 
-        : duration(fireDuration) {
-        fireSprite.setTexture(fireTexture);
+FireTile::FireTile(Vector2f& position, int direction, float size) 
+    //direction 
+    //0=horiontal
+    //1=vertical
+    //
+        : duration(0.5f) {
+        fireTexture = make_unique<Texture>();
+        fireTexture->loadFromFile("images/fire.png");
+        fireSprite.setTexture(*fireTexture);
+        fireSprite.setTextureRect(IntRect(16*direction,0, 16,16));
         fireSprite.setPosition(position);
+        fireSprite.setScale(float(size)/16.0f, size/16.0f);
         timer.restart();
     }
 
@@ -211,6 +222,13 @@ void Mapa_2::draw(RenderWindow& window) {
             sprites_map[i][j]->draw(window);
         }
     }
+
+    for (auto& f : fire) {
+        if (f.isExpired()) {
+            continue;
+        }
+        f.draw(window);
+    }
 }
 
 vector<vector<char>> Mapa_2::getMatriz(){
@@ -224,3 +242,9 @@ vector<vector<Block*>> Mapa_2::getMatrizSprites(){
 int Mapa_2::getBlockSize() {
     return sizeBlock;
 }
+
+void Mapa_2::insertFire(Vector2i pos, int dir) {
+    auto coords = get_coords(pos);
+    fire.push_back(FireTile(coords,dir,sizeBlock));
+}
+

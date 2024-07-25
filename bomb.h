@@ -1,11 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <memory>
-class Mapa_2;
 #include "animation.h"
+#include "mapa.h"
 
 using namespace sf;
 using namespace std;
+
 class Bomb{
     private:
         RectangleShape bomb;

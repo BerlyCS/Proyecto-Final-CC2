@@ -1,5 +1,6 @@
 #include "bomb.h"
 #include "mapa.h"
+#include <SFML/System/Vector2.hpp>
 
 Bomb::Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius) : frames(0.2f){
     //se establece el tamaño de la bomba al tamaño de un bloque del mapa
@@ -61,8 +62,11 @@ void Bomb::destroy(Mapa_2 &map) {
                 delete map.get_block_at(m.x, m.y - i);
                 map.to_tile_at(Vector2i(m.x,m.y - i));
                 up=false;
+                map.insertFire(Vector2i(m.x, m.y - i), 1);
             } else if ( map.get_block_at(m.x, m.y - i)->IsCollidable()){
                 up = false;
+            } else {
+                map.insertFire(Vector2i(m.x, m.y - i), 1);
             } 
             
         }
@@ -71,9 +75,12 @@ void Bomb::destroy(Mapa_2 &map) {
             if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y + i);
                 map.to_tile_at(Vector2i(m.x,m.y + i));
+                map.insertFire(Vector2i(m.x, m.y + i), 1);
                 down=false;
             } else  if ( map.get_block_at(m.x, m.y + i)->IsCollidable() ){
                 down= false;
+            } else {
+                map.insertFire(Vector2i(m.x, m.y + i), 1);
             } 
             
         }
@@ -82,9 +89,12 @@ void Bomb::destroy(Mapa_2 &map) {
             if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x - i, m.y);
                 map.to_tile_at(Vector2i(m.x - i,m.y));
+                map.insertFire(Vector2i(m.x - i, m.y), 0);
                 left=false;
             } else  if (map.get_block_at(m.x - i, m.y)->IsCollidable() ){
                 left = false;
+            } else { 
+                map.insertFire(Vector2i(m.x - i, m.y), 0);
             } 
             
         }
@@ -93,9 +103,13 @@ void Bomb::destroy(Mapa_2 &map) {
             if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x+i, m.y);
                 map.to_tile_at(Vector2i(m.x+i,m.y ));
+                map.insertFire(Vector2i(m.x + i, m.y), 0);
                 right=false;
             }else if ( map.get_block_at(m.x + i, m.y)->IsCollidable() ){
                 right = false;
+            } else {
+
+                map.insertFire(Vector2i(m.x + i, m.y), 0);
             } 
         }
     }

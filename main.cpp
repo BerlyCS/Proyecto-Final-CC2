@@ -21,7 +21,7 @@
 #include "animation.cpp"
 #include "menu.cpp"
 #include "player.h"
-#include "ejemplos/sound.cpp"
+#include "sound.cpp"
 
 using namespace sf;
 using namespace std;
