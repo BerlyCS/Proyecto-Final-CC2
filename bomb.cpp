@@ -22,6 +22,8 @@ Bomb::Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius) : frame
 
     this->radius = radius; //radius 1
     this->m = mat_pos;
+
+    this->type=0;
 }
 
 bool Bomb::isAlive() const {
@@ -29,7 +31,7 @@ bool Bomb::isAlive() const {
 }
 
 void Bomb::update() {
-    if (lifeTimer.getElapsedTime().asSeconds() >= 2.0) {
+    if (lifeTimer.getElapsedTime().asSeconds() >= 3.0) {
         alive = false;
     }
 }
@@ -58,36 +60,43 @@ void Bomb::destroy(Mapa_2 &map) {
             if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y - i);
                 map.to_tile_at(Vector2i(m.x,m.y - i));
-            } else {
                 up=false;
-            }
+            } else if ( map.get_block_at(m.x, m.y - i)->IsCollidable()){
+                up = false;
+            } 
+            
         }
         //down tiles
         if ( m.y + i < 13 && down) {
             if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y + i);
                 map.to_tile_at(Vector2i(m.x,m.y + i));
-            } else {
                 down=false;
-            }
+            } else  if ( map.get_block_at(m.x, m.y + i)->IsCollidable() ){
+                down= false;
+            } 
+            
         }
         //left tiles
         if ( m.x - i > 0 && left ) {
             if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x - i, m.y);
                 map.to_tile_at(Vector2i(m.x - i,m.y));
-            } else {
                 left=false;
-            }
+            } else  if (map.get_block_at(m.x - i, m.y)->IsCollidable() ){
+                left = false;
+            } 
+            
         }
         //right tiles
         if ( m.x + i < 13  && right) {
             if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x+i, m.y);
                 map.to_tile_at(Vector2i(m.x+i,m.y ));
-            } else {
                 right=false;
-            }
+            }else if ( map.get_block_at(m.x + i, m.y)->IsCollidable() ){
+                right = false;
+            } 
         }
     }
     /* if(map.getMatrizSprites()[matrizIndex.x-1][matrizIndex.y]->IsCollidable()){

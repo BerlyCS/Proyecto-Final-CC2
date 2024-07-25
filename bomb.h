@@ -17,7 +17,7 @@ class Bomb{
         Clock lifeTimer;
         bool alive;
         int radius;
-
+        int type;
         bool stayBomb;
     public:
         Bomb(Mapa_2& mapa, Vector2f position, Vector2i mat_pos,int radius = 1);
