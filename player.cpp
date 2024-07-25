@@ -52,6 +52,26 @@ void Player::checkCollision(Mapa_2& map, Vector2f movement){
         }
     }
 
+    bool aux;
+    if(!bombasColliders.empty()){
+        for(auto &bombas : bombasColliders){
+            aux = false;
+            for(auto &mybombs : bombs){
+                if(bombas == mybombs.get_sprite().getGlobalBounds()){
+                    move(mybombs.collision(collider.getGlobalBounds(), movement));
+                    aux = true;
+                    break;
+                }
+            }
+            if(playerBounds.intersects(bombas) && aux == false){
+                move(-movement);
+            }
+        }
+    }
+
+
+/*
+
     if(!bombasColliders.empty()){
         for(auto &bomb: bombasColliders){
             if(playerBounds.intersects(bomb)){
@@ -59,8 +79,8 @@ void Player::checkCollision(Mapa_2& map, Vector2f movement){
             }
         }
     }
+*/
 }
-
 
 Player_one::Player_one(Mapa_2& mapa, int WIDTH, int HEIGHT){
     position = mapa.get_coords(Vector2i(1,1));
@@ -303,6 +323,8 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
             Vector2f bombPosition = map.get_coords(matrizIndex);
             /* cout<<"Bomb pos: "<<bombPosition.x<<", "<<bombPosition.y<<endl; */
             bombs.push_back(Bomb(map, bombPosition, matrizIndex, bombpower));
+            int last = bombs.size();
+            bombasColliders.push_back(bombs[last-1].get_sprite().getGlobalBounds());
             isBomb = true;
         }
     }
@@ -314,6 +336,7 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
             bombexplosion.play();
             it->destroy(map);
             it = bombs.erase(it);
+            bombasColliders.pop_back();
             isBomb = false;
         } else {
             it->draw(window,dt);

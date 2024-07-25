@@ -114,10 +114,6 @@ Vector2f Bomb::collision(FloatRect playerCollider, Vector2f movement){
     }
 }
 
-bool Bomb::get_stay_bomb(){ return stayBomb; }
-
-void Bomb::set_stay_bomb(bool x) { stayBomb = x;}
-
 void Bomb::bombKill(FloatRect playerCollider, Mapa_2 map, bool &isAlive){
     for(int i=1; i<=radius; i++){
         if ( m.y - i >= 0 ) {

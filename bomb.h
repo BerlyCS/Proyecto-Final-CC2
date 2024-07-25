@@ -30,7 +30,5 @@ class Bomb{
         Sprite& get_sprite();
         Vector2f collision(FloatRect playerCollider, Vector2f movement);
         void bombKill(FloatRect playerCollider, Mapa_2 map, bool &isAlive);
-        bool get_stay_bomb();
-        void set_stay_bomb(bool);
 };
 
