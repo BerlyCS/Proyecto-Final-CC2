@@ -232,7 +232,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
         right_frames.applyToSprite(sprite);
         //sprite.move(speed, 0);
     }
-    if (Keyboard::isKeyPressed(Keyboard::Space)) {
+    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
             Sound_Singleton::play_bombplace();
@@ -329,7 +329,7 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
         right_frames.applyToSprite(sprite);
         //sprite.move(speed, 0);
     }
-    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+    if (Keyboard::isKeyPressed(Keyboard::Space)) {
 
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
