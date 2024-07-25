@@ -61,7 +61,7 @@ class Tile : public Block{
 class FireTile {
 private:
     Sprite fireSprite;
-    unique_ptr<Texture> fireTexture;
+    Texture fireTexture;
     Clock timer;
     float duration;
 public:

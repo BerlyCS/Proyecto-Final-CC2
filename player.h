@@ -21,10 +21,6 @@ class Player {
         bool isAlive;
         bool isBomb;
         vector<Bomb> bombs;
-        SoundBuffer bombplace_b;
-        Sound bombplace;
-        SoundBuffer bombexplosion_b;
-        Sound bombexplosion;
 
         Vector2f get_center_pos() {
             Vector2f size = collider.getSize();

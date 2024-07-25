@@ -12,6 +12,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
+#include "sound.cpp"
 
 using namespace sf;
 
@@ -19,8 +20,6 @@ class Button {
 private:
     RectangleShape block;
     Text text;
-    SoundBuffer buffer;
-    Sound sound;
 public:
     Button(Vector2f pos, std::string textStr, Font& font, int textSize, int margin = 5) : 
      text(textStr,font,textSize){
@@ -33,9 +32,7 @@ public:
         block.setFillColor(Color(100, 100, 100));
         block.setPosition(Vector2f(pos.x-5, pos.y-5));
 
-        buffer.loadFromFile("button.wav");
-        sound.setBuffer(buffer);
-        sound.play();
+        /* sound.play(); */
     }
 
     bool isClicked(RenderWindow& window) {
@@ -50,7 +47,7 @@ public:
         Vector2i mousePos = Mouse::getPosition(window);
         if (block.getGlobalBounds().contains(static_cast<Vector2f>(mousePos))) {
             block.setFillColor(Color(50,50,50,100));
-            sound.play();
+            /* sound.play(); */
         }
         else {
             block.setFillColor(Color(100,100,100,100));
@@ -72,6 +69,7 @@ private:
     Sprite backgroundSprite;
 public:
     Menu(int SCREEN_SIZE) {
+        Sound_Singleton::play_menu_theme();
         if (!font.loadFromFile("font.ttf")) {
             std::cout << "Error al cargar font-ttf" << std::endl;
         }
@@ -90,6 +88,7 @@ public:
         for (auto& button : buttons) {
             if (button.isClicked(window)) {
                 if (button.getText() == "Start") {
+                    Sound_Singleton::stop_menu();
                     Game_started = true;
                 } else if (button.getText() == "Exit") {
                     window.close();

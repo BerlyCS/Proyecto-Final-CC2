@@ -61,15 +61,14 @@ bool Tile::IsBreakable(){
 }
 
 
-FireTile::FireTile(Vector2f& position, int direction, float size) 
+FireTile::FireTile(Vector2f& position, int direction, float size) : duration(0.5f) {
     //direction 
     //0=horiontal
     //1=vertical
     //
-        : duration(0.5f) {
-        fireTexture = make_unique<Texture>();
-        fireTexture->loadFromFile("images/fire.png");
-        fireSprite.setTexture(*fireTexture);
+        /* fireTexture = make_shared<Texture>(Texture()); */
+        fireTexture.loadFromFile("images/fire.png");
+        fireSprite.setTexture(fireTexture);
         fireSprite.setTextureRect(IntRect(16*direction,0, 16,16));
         fireSprite.setPosition(position);
         fireSprite.setScale(float(size)/16.0f, size/16.0f);
@@ -223,11 +222,13 @@ void Mapa_2::draw(RenderWindow& window) {
         }
     }
 
-    for (auto& f : fire) {
-        if (f.isExpired()) {
+    for (auto it = fire.begin(); it != fire.end(); it++) {
+        if (it->isExpired()) {
             continue;
         }
-        f.draw(window);
+        else {
+            it->draw(window);
+        }
     }
 }
 

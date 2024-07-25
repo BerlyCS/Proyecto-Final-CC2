@@ -1,4 +1,4 @@
-main: main.o bomb.o player.o
+main: main.o bomb.o player.o sound.o
 	g++ main.o bomb.o player.o -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -g3 -Wall -Wextra
 	./test.exe
 
@@ -10,6 +10,10 @@ bomb.o: bomb.cpp
 
 player.o: player.cpp
 	g++ -c player.cpp -I/usr/include/ -o player.o
+
+sound: sound.cpp
+	g++ -c sound.cpp -I/usr/include/ -o sound.o
+
 
 powerup:
 	g++ powerup.cpp -I/usr/include/ -o powerup -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio

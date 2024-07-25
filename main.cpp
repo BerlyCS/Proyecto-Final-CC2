@@ -21,7 +21,7 @@
 #include "animation.cpp"
 #include "menu.cpp"
 #include "player.h"
-#include "sound.cpp"
+#include "sound.hpp"
 
 using namespace sf;
 using namespace std;
@@ -59,8 +59,11 @@ class Facade_game {
                 //player.validadMovimiento(mapa.getMatriz());
                 if (event.type == Event::Closed)
                     window.close();
-                if (Keyboard::isKeyPressed(Keyboard::Escape)) 
+                if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                    Sound_Singleton::stop_battle();
+                    Sound_Singleton::play_menu_theme();
                     Game_started = false;
+                } 
 
                 if (event.type == sf::Event::KeyPressed) {
                     switch (event.key.code) {
@@ -108,6 +111,7 @@ class Facade_game {
 };
 
 int main(int argc, char* argv[]) {
+    Sound_Singleton::init();
     Facade_game game;
     while (game.is_Running()) {
         game.update_game();

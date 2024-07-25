@@ -1,4 +1,6 @@
+#pragma once
 #include "player.h"
+#include "sound.hpp"
 #include <SFML/Graphics.hpp>
 
 
@@ -6,10 +8,6 @@ using namespace sf;
 using namespace std;
 
 Player::Player() : down_frames(0.15f), up_frames(0.15f), left_frames(0.15f), right_frames(0.15f), isBomb(false) {
-    bombplace_b.loadFromFile("26.wav");
-    bombplace.setBuffer(bombplace_b);
-    bombexplosion_b.loadFromFile("27.wav");
-    bombexplosion.setBuffer(bombexplosion_b);
     speed = 5.0f;
     bombcount = 1;
     bombpower = 2;
@@ -125,7 +123,7 @@ void Player_one::joystockControl(Mapa_2 &map, RenderWindow& window, float& dt)
 
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
-            bombplace.play();
+            Sound_Singleton::play_bombplace();
             /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
             cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
             Vector2f bombPosition = map.get_coords(matrizIndex);
@@ -147,7 +145,7 @@ void Player_one::joystockControl(Mapa_2 &map, RenderWindow& window, float& dt)
 
     for (auto it = bombs.begin(); it != bombs.end();) {
         if (!it->isAlive()) {
-            bombexplosion.play();
+            Sound_Singleton::play_bombexplosion();
             it->destroy(map);
             //this->isAlive = false;
             it->bombKill(collider.getGlobalBounds(), map, isAlive);
@@ -195,7 +193,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
     if (Keyboard::isKeyPressed(Keyboard::Space)) {
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
-            bombplace.play();
+            Sound_Singleton::play_bombplace();
             //cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl;
             cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl;
             Vector2f bombPosition = map.get_coords(matrizIndex);
@@ -214,7 +212,7 @@ void Player_one::controlar(Mapa_2 &map, RenderWindow& window, float& dt){
 
     for (auto it = bombs.begin(); it != bombs.end();) {
         if (!it->isAlive()) {
-            bombexplosion.play();
+            Sound_Singleton::play_bombexplosion();
             it->destroy(map);
             it = bombs.erase(it);
             isBomb = false;
@@ -290,7 +288,7 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
 
         if (isBomb == false) { // Cooldown de 0.5 segundos entre bombas
             Vector2i matrizIndex = map.get_mat_coords(get_center_pos());
-            bombplace.play();
+            Sound_Singleton::play_bombplace();
             /* cout<<get_center_pos().x<<' '<<get_center_pos().y<<endl; */
             /* cout<<matrizIndex.x<<' '<<matrizIndex.y<<endl; */
             Vector2f bombPosition = map.get_coords(matrizIndex);
@@ -304,7 +302,7 @@ void Player_two::controlar(Mapa_2 &map, RenderWindow& window,float& dt){
     }
     for (auto it = bombs.begin(); it != bombs.end();) {
         if (!it->isAlive()) {
-            bombexplosion.play();
+            Sound_Singleton::play_bombexplosion();
             it->destroy(map);
             it = bombs.erase(it);
             isBomb = false;
