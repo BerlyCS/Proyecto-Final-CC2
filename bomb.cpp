@@ -50,36 +50,43 @@ Vector2f Bomb::getPosition() const {
     return center_pos;
 }
 
-//Por alguna razon se borran los objetos en
-//con las coordenadas invertidas
 void Bomb::destroy(Mapa_2 &map) {
+    bool up=true,down=true,right=true,left=true;
     for (int i = 1; i<=radius; i++) {
         //up tiles
-        if ( m.y - i >= 0 ) {
+        if ( m.y - i >= 0 && up ) {
             if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y - i);
                 map.to_tile_at(Vector2i(m.x,m.y - i));
+            } else {
+                up=false;
             }
         }
         //down tiles
-        if ( m.y + i < 13 ) {
+        if ( m.y + i < 13 && down) {
             if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
                 delete map.get_block_at(m.x, m.y + i);
                 map.to_tile_at(Vector2i(m.x,m.y + i));
+            } else {
+                down=false;
             }
         }
         //left tiles
-        if ( m.x - i > 0 ) {
+        if ( m.x - i > 0 && left ) {
             if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x - i, m.y);
                 map.to_tile_at(Vector2i(m.x - i,m.y));
+            } else {
+                left=false;
             }
         }
         //right tiles
-        if ( m.x + i < 13 ) {
+        if ( m.x + i < 13  && right) {
             if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
                 delete map.get_block_at(m.x+i, m.y);
                 map.to_tile_at(Vector2i(m.x+i,m.y ));
+            } else {
+                right=false;
             }
         }
     }

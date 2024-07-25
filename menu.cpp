@@ -71,7 +71,7 @@ private:
     Texture backgroundTexture;
     Sprite backgroundSprite;
 public:
-    Menu() {
+    Menu(int SCREEN_SIZE) {
         if (!font.loadFromFile("font.ttf")) {
             std::cout << "Error al cargar font-ttf" << std::endl;
         }
@@ -80,7 +80,7 @@ public:
         }
         backgroundSprite.setTexture(backgroundTexture);
         auto size = backgroundTexture.getSize();
-        backgroundSprite.scale(float(1000)/size.x, float(1000)/size.y);
+        backgroundSprite.scale(float(SCREEN_SIZE)/size.x, float(SCREEN_SIZE)/size.y);
 
         buttons.push_back(Button(Vector2f(100, 100), "Start", font, 50));
         buttons.push_back(Button(Vector2f(100, 200), "Exit", font, 50));

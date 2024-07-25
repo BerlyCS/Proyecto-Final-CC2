@@ -57,13 +57,18 @@ class Tile : public Block{
         ~Tile() = default;
 };
 
-class Fire_Tile : public Block {
-    public:
-        Fire_Tile(int WIDTH, int HEIGHT);
-
-        bool IsCollidable();
-        bool IsBreakable();
+class FireTile {
+private:
+    Sprite fireSprite;
+    Texture fireTexture;
+    Clock timer;
+    float duration;
+public:
+    FireTile(string&, Vector2f& , float ); 
+    bool isExpired() const;
+    void draw(RenderWindow& window);
 };
+
 class Mapa_2 {
 private:
     Texture texture;
