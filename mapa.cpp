@@ -62,6 +62,16 @@ bool Tile::IsBreakable(){
     return false;
 }
 
+Block* factory::crearTile(int w, int h) {
+    return new Tile(w,h);
+}
+
+Block* factory::crearweakWall(int w, int h) {
+    return new WeakWall(w,h);
+}
+Block* factory::crearWall(int w, int h) {
+    return new Wall(w,h);
+}
 Texture FireTile::fireTexture = Texture();
 
 FireTile::FireTile(Vector2f& position, int direction, float size) : duration(0.5f) {
@@ -110,6 +120,7 @@ Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
 
     matriz = vector<vector<char>>(13, vector<char>(13, ' '));
     generarMatriz();
+    factory creator;
     // Inicializar sprites_map y matriz
     for (int j = 0; j < 13; j++) {
         vector<Block*> filaSprites;
@@ -118,13 +129,13 @@ Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
             Sprite sprite;
             sprite.setTexture(texture);
             if (matriz[i][j] == '#') {
-                bloque = new Wall(WIDTH, HEIGHT);
+                bloque = creator.crearWall(WIDTH, HEIGHT);
                 sprite.setTextureRect(frames[0]);
             } else if (matriz[i][j] == 'x') {
-                bloque = new WeakWall(WIDTH, HEIGHT);
+                bloque = creator.crearweakWall(WIDTH, HEIGHT);
                 sprite.setTextureRect(frames[1]);
             } else {
-                bloque = new Tile(WIDTH, HEIGHT);
+                bloque = creator.crearTile(WIDTH, HEIGHT);
                 sprite.setTextureRect(frames[2]);
             }
             auto size = frames[0].getSize();

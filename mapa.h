@@ -58,6 +58,14 @@ class Tile : public Block{
         ~Tile() = default;
 };
 
+class factory {
+    public:
+        ~factory() {}
+        Block* crearWall(int,int);
+        Block* crearweakWall(int,int);
+        Block* crearTile(int,int);
+};
+
 class FireTile {
 private:
     Sprite fireSprite;
