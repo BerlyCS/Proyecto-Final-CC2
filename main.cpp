@@ -21,6 +21,7 @@
 #include "animation.cpp"
 #include "menu.cpp"
 #include "player.h"
+#include "ejemplos/sound.cpp"
 
 using namespace sf;
 using namespace std;
@@ -43,6 +44,7 @@ class Facade_game {
             window.setVerticalSyncEnabled(true);
             mapa.Print();
             Game_started = true;
+            Sound_Singleton::init();//agrega singleton
         }
 
         bool is_Running() {
@@ -59,6 +61,31 @@ class Facade_game {
                     window.close();
                 if (Keyboard::isKeyPressed(Keyboard::Escape)) 
                     Game_started = false;
+
+                if (event.type == sf::Event::KeyPressed) {
+                    switch (event.key.code) {
+                        case sf::Keyboard::Num1:
+                            Sound_Singleton::play_battle_1();
+                            break;
+                        case sf::Keyboard::Num2:
+                            Sound_Singleton::play_battle_2();
+                            break;
+                        case sf::Keyboard::Num3:
+                            Sound_Singleton::play_bombexplosion();
+                            break;
+                        case sf::Keyboard::Num4:
+                            Sound_Singleton::play_bombplace();
+                            break;
+                        case sf::Keyboard::Num5:
+                            Sound_Singleton::play_powerup();
+                            break;
+                        case sf::Keyboard::Num6:
+                            Sound_Singleton::play_menu_theme();
+                            break;
+                        default:
+                            break;
+                    }
+                }                
             }
             if (!Game_started) {
                 menu.handleEvent(window, Game_started);
