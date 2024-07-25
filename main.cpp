@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Clock.hpp>
+#include <SFML/System/Time.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -17,6 +18,7 @@
 #include <SFML/Audio.hpp>
 #include <chrono>
 #include <cstdlib>
+#include <ctime>
 #include <thread>
 #include "mapa.h"
 #include "mapa.cpp"
@@ -30,6 +32,8 @@ using namespace std;
 
 #define SCREEN_SIZE 1000
 
+
+
 class Facade_game {
     private:
         RenderWindow window;
@@ -42,7 +46,7 @@ class Facade_game {
         int WIDTH;
         int HEIGHT;
     public:
-        Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE), menu(SCREEN_SIZE) {
+        Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%7), menu(SCREEN_SIZE) {
             window.setVerticalSyncEnabled(true);
             mapa.Print();
             Game_started = true;
@@ -127,7 +131,7 @@ class Facade_game {
 };
 
 int main(int argc, char* argv[]) {
-    Sound_Singleton::init();
+    srand(time(nullptr));
     Facade_game game;
     while (game.is_Running()) {
         game.update_game();
