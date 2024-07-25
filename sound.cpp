@@ -68,3 +68,8 @@ void Sound_Singleton::play_menu_theme() {
 void Sound_Singleton::stop_menu() {
     menu_theme.stop();
 }
+
+void Sound_Singleton::stop_battle() {
+    battle_theme1.stop();
+    battle_theme2.stop();
+}

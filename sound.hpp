@@ -18,4 +18,5 @@ class Sound_Singleton {
         static void play_powerup();
         static void play_menu_theme();
         static void stop_menu();
+        static void stop_battle();
 };

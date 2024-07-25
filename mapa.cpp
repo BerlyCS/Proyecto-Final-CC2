@@ -60,6 +60,7 @@ bool Tile::IsBreakable(){
     return false;
 }
 
+Texture FireTile::fireTexture = Texture();
 
 FireTile::FireTile(Vector2f& position, int direction, float size) : duration(0.5f) {
     //direction 

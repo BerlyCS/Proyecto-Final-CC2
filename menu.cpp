@@ -11,8 +11,10 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <cstdlib>
 #include <iostream>
 #include "sound.cpp"
+#include "sound.hpp"
 
 using namespace sf;
 
@@ -89,6 +91,8 @@ public:
             if (button.isClicked(window)) {
                 if (button.getText() == "Start") {
                     Sound_Singleton::stop_menu();
+                    srand(10); 
+                    rand()%2 ? Sound_Singleton::play_battle_1() : Sound_Singleton::play_battle_2();
                     Game_started = true;
                 } else if (button.getText() == "Exit") {
                     window.close();
