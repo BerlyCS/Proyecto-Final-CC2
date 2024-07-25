@@ -33,7 +33,7 @@ public:
         block.setFillColor(Color(100, 100, 100));
         block.setPosition(Vector2f(pos.x-5, pos.y-5));
 
-        buffer.loadFromFile("2.wav");
+        buffer.loadFromFile("button.wav");
         sound.setBuffer(buffer);
         sound.play();
     }
