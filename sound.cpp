@@ -74,13 +74,15 @@ sf::Sound Sound_Singleton::battle_theme1;
 sf::Sound Sound_Singleton::battle_theme2;
 sf::Sound Sound_Singleton::powerup;
 sf::Sound Sound_Singleton::menu_theme;
-
+ 
+ //test content
+ /*
 int main() {
-    Sound_Singleton::init();
+    Sound_Singleton::init(); //iniciar
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Sound Test");
 
-    while (window.isOpen()) {
+    while (window.isOpen()) { //event manager
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -119,3 +121,4 @@ int main() {
 
     return 0;
 }
+*/
