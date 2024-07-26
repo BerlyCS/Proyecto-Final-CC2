@@ -42,11 +42,13 @@ class Facade_game {
         int WIDTH;
         int HEIGHT;
     public:
-        Facade_game(int SCREEN_SIZE) : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%6), menu(SCREEN_SIZE) {
+        Facade_game(int SCREEN_SIZE) : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%7), menu(SCREEN_SIZE) {
             window.setVerticalSyncEnabled(true);
             mapa.Print();
             Game_started = false;
             Sound_Singleton::init();//agrega singleton
+            Sound_Singleton::play_menu_theme();
+            /* cout<<"estilo: "<<mapa.get_map_style()<<endl; */
         }
 
         bool is_Running() {

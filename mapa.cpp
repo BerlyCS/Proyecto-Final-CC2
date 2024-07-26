@@ -103,7 +103,7 @@ FloatRect FireTile::get_rect() {
 
 Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
     screen_size = Vector2i(WIDTH, HEIGHT);
-    texture.loadFromFile("images/wall_textur.png");
+    texture.loadFromFile("images/map_textur.png");
     IntRect frames[3];
 
     for(int i =0 ; i<3 ; i++) {

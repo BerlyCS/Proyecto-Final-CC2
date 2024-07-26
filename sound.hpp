@@ -1,12 +1,14 @@
 #pragma once
 #include <SFML/Audio.hpp>
+#include <SFML/Audio/Music.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
 class Sound_Singleton {
     private:
-        static sf::SoundBuffer bombexplosion_b, bombplace_b, battle_theme1_b, battle_theme2_b, powerup_b, menu_theme_b;
-        static sf::Sound bombexplosion, bombplace, battle_theme1, battle_theme2, powerup, menu_theme;
+        static sf::SoundBuffer bombexplosion_b, bombplace_b, powerup_b;
+        static sf::Sound bombexplosion, bombplace, powerup;
+        static sf::Music battle_theme1, battle_theme2, menu_theme;
         Sound_Singleton() = default;
 
     public:
@@ -20,4 +22,5 @@ class Sound_Singleton {
         static void play_menu_theme();
         static void stop_menu();
         static void stop_battle();
+        static bool is_playing_theme();
 };

@@ -1,27 +1,20 @@
 #include "sound.hpp"
+#include <SFML/Audio/Music.hpp>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 
 sf::SoundBuffer Sound_Singleton::bombexplosion_b;
 sf::SoundBuffer Sound_Singleton::bombplace_b;
-sf::SoundBuffer Sound_Singleton::battle_theme1_b;
-sf::SoundBuffer Sound_Singleton::battle_theme2_b;
 sf::SoundBuffer Sound_Singleton::powerup_b;
-sf::SoundBuffer Sound_Singleton::menu_theme_b;
 sf::Sound Sound_Singleton::bombexplosion;
 sf::Sound Sound_Singleton::bombplace;
-sf::Sound Sound_Singleton::battle_theme1;
-sf::Sound Sound_Singleton::battle_theme2;
+sf::Music Sound_Singleton::battle_theme1;
+sf::Music Sound_Singleton::battle_theme2;
 sf::Sound Sound_Singleton::powerup;
-sf::Sound Sound_Singleton::menu_theme;
+sf::Music Sound_Singleton::menu_theme;
 
 void Sound_Singleton::init() {
-    if (!battle_theme1_b.loadFromFile("sound/battle.wav")) {
-        std::cerr << "Error al cargar sound/battle.wav" << std::endl;
-    }
-    if (!battle_theme2_b.loadFromFile("sound/battle2.ogg")) {
-        std::cerr << "Error al cargar sound/battle2.ogg" << std::endl;
-    }
     if (!bombexplosion_b.loadFromFile("sound/bomb.wav")) {
         std::cerr << "Error al cargar sound/bomb.wav" << std::endl;
     }
@@ -31,16 +24,28 @@ void Sound_Singleton::init() {
     if (!powerup_b.loadFromFile("sound/powerup.wav")) {
         std::cerr << "Error al cargar sound/powerup.wav" << std::endl;
     }
-    if (!menu_theme_b.loadFromFile("sound/menu.ogg")) {
-        std::cerr << "Error al cargar sound/menu.ogg" << std::endl;
+
+    if (!menu_theme.openFromFile("sound/menu.ogg")) {
+        std::cerr<<"error al cargar menu theme";
+    }
+    if (!battle_theme1.openFromFile("sound/battle.wav")) {
+        std::cerr<<"error al cargar battle theme";
+    }
+    if (!battle_theme2.openFromFile("sound/battle2.ogg")) {
+        std::cerr<<"error al cargar battle2 theme";
     }
 
-    battle_theme1.setBuffer(battle_theme1_b);
-    battle_theme2.setBuffer(battle_theme2_b);
+    menu_theme.setLoop(true);
+    battle_theme1.setLoop(true);
+    battle_theme2.setLoop(true);
+
+    menu_theme.setVolume(70.f);
+    battle_theme1.setVolume(70.f);
+    battle_theme2.setVolume(70.0f);
+
     bombexplosion.setBuffer(bombexplosion_b);
     bombplace.setBuffer(bombplace_b);
     powerup.setBuffer(powerup_b);
-    menu_theme.setBuffer(menu_theme_b);
 }
 
 void Sound_Singleton::play_battle_1() {
