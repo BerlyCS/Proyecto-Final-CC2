@@ -42,6 +42,7 @@ class Player {
         void checkCollision(Mapa_2& map, Vector2f movement);
         RectangleShape getCollider();
         bool alive();
+        void kill_anim();
 };
 
 class Player_one : public Player {

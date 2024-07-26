@@ -1,4 +1,5 @@
 #include "player.h"
+#include "animation.h"
 #include "mapa.h"
 #include "sound.hpp"
 #include <SFML/Graphics.hpp>
@@ -27,6 +28,11 @@ void Player::check_deaths(Mapa_2& map) {
 
 bool Player::alive() {
     return isAlive;
+}
+
+void Player::kill_anim() {
+    ASprite kill(0.5f);
+    
 }
 
 //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
