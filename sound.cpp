@@ -28,7 +28,7 @@ void Sound_Singleton::init() {
     if (!menu_theme.openFromFile("sound/menu.ogg")) {
         std::cerr<<"error al cargar menu theme";
     }
-    if (!battle_theme1.openFromFile("sound/battle.wav")) {
+    if (!battle_theme1.openFromFile("sound/battle.ogg")) {
         std::cerr<<"error al cargar battle theme";
     }
     if (!battle_theme2.openFromFile("sound/battle2.ogg")) {
