@@ -61,9 +61,9 @@ class Tile : public Block{
 class factory {
     public:
         ~factory() {}
-        Block* crearWall(int,int);
-        Block* crearweakWall(int,int);
-        Block* crearTile(int,int);
+        shared_ptr<Block> crearWall(int,int);
+        shared_ptr<Block> crearweakWall(int,int);
+        shared_ptr<Block> crearTile(int,int);
 };
 
 class FireTile {
@@ -83,7 +83,7 @@ class Mapa_2 {
 private:
     Texture texture;
     float sizeBlock;
-    vector< vector<Block*>> sprites_map;
+    vector< vector<shared_ptr<Block>>> sprites_map;
     vector< vector<char>> matriz;
     queue<Bomb*> bombsEvents;
     Vector2i screen_size;
@@ -96,13 +96,13 @@ public:
     Vector2i get_screen_size() const;
     Vector2f get_coords(Vector2i pos) const;
     Vector2i get_mat_coords(Vector2f pos);
-    Block*& get_block_at(int x, int y);
+    shared_ptr<Block>& get_block_at(int x, int y);
     int get_map_style();
     void generarMatriz();
     void Print() const;
     void draw(RenderWindow& window);
     vector<vector<char>> getMatriz();
-    vector<vector<Block*>> getMatrizSprites();
+    vector<vector<shared_ptr<Block>>> getMatrizSprites();
     int getBlockSize();
     void insertFire(Vector2i pos, int dir);
     vector<FireTile>& getFire();

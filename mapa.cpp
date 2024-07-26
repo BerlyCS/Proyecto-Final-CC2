@@ -62,15 +62,15 @@ bool Tile::IsBreakable(){
     return false;
 }
 
-Block* factory::crearTile(int w, int h) {
-    return new Tile(w,h);
+shared_ptr<Block> factory::crearTile(int w, int h) {
+    return make_shared<Tile>(w, h);
 }
 
-Block* factory::crearweakWall(int w, int h) {
-    return new WeakWall(w,h);
+shared_ptr<Block> factory::crearweakWall(int w, int h) {
+    return make_shared<WeakWall>(w, h);
 }
-Block* factory::crearWall(int w, int h) {
-    return new Wall(w,h);
+shared_ptr<Block>  factory::crearWall(int w, int h) {
+    return make_shared<Wall>(w, h);
 }
 Texture FireTile::fireTexture = Texture();
 
@@ -123,9 +123,9 @@ Mapa_2::Mapa_2(int WIDTH, int HEIGHT, int map_style) : map_style(map_style) {
     factory creator;
     // Inicializar sprites_map y matriz
     for (int j = 0; j < 13; j++) {
-        vector<Block*> filaSprites;
+        vector<shared_ptr<Block>> filaSprites;
         for (int i = 0; i < 13; i++) {
-            Block* bloque;
+            shared_ptr<Block> bloque;
             Sprite sprite;
             sprite.setTexture(texture);
             if (matriz[i][j] == '#') {
@@ -154,8 +154,8 @@ void Mapa_2::to_tile_at(Vector2i index) {
     /* delete sprites_map[index.y][index.x]; */
     /* cout<<flush<<"deleted!"<<endl; */
     /* cout<<flush<<"setting new tile..."<<endl; */
-    sprites_map[index.x][index.y] = new Tile(get_screen_size().x, get_screen_size().y);
-    Block* bloque = sprites_map[index.x][index.y];
+    sprites_map[index.x][index.y] = make_shared<Tile>(get_screen_size().x, get_screen_size().y);
+    shared_ptr<Block> bloque = sprites_map[index.x][index.y];
 
     /* cout<<flush<<"done..."<<endl; */
 
@@ -189,7 +189,7 @@ Vector2i Mapa_2::get_mat_coords(Vector2f pos) {
     return Vector2i((pos.x/sizeBlock), (pos.y/sizeBlock));
 }
 
-Block*& Mapa_2::get_block_at(int x, int y) {
+shared_ptr<Block>& Mapa_2::get_block_at(int x, int y) {
     return sprites_map[x][y];
 }
 
@@ -253,7 +253,7 @@ vector<vector<char>> Mapa_2::getMatriz(){
     return matriz;
 }
 
-vector<vector<Block*>> Mapa_2::getMatrizSprites(){
+vector<vector<shared_ptr<Block>>> Mapa_2::getMatrizSprites(){
     return sprites_map;
 }
 
