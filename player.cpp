@@ -1,5 +1,4 @@
 #include "player.h"
-#include "animation.h"
 #include "mapa.h"
 #include "sound.hpp"
 #include <SFML/Graphics.hpp>
@@ -30,10 +29,10 @@ bool Player::alive() {
     return isAlive;
 }
 
-void Player::kill_anim() {
-    ASprite kill(0.5f);
+/* void Player::kill_anim() { */
+/*     ASprite kill(0.5f); */
     
-}
+/* } */
 
 //Devolver un Vector2f para obtener los valores de los puntos *sugerencia.....!!!!!!!!!
 void Player::move(Vector2f movement){
