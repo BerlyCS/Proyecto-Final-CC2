@@ -1,5 +1,5 @@
-main: main.o bomb.o player.o sound.o
-	g++ main.o bomb.o player.o -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -g3 -Wall -Wextra
+main: main.o bomb.o player.o sound.o mapa.o menu.o facade.o
+	g++ main.o bomb.o player.o mapa.o menu.o sound.o facade.o -o test.exe -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -g3 -Wall -Wextra
 	./test.exe
 
 windows:
