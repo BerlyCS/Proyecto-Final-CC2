@@ -30,10 +30,6 @@
 using namespace sf;
 using namespace std;
 
-#define SCREEN_SIZE 1000
-
-
-
 class Facade_game {
     private:
         RenderWindow window;
@@ -46,7 +42,7 @@ class Facade_game {
         int WIDTH;
         int HEIGHT;
     public:
-        Facade_game() : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%6), menu(SCREEN_SIZE) {
+        Facade_game(int SCREEN_SIZE) : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%6), menu(SCREEN_SIZE) {
             window.setVerticalSyncEnabled(true);
             mapa.Print();
             Game_started = false;
@@ -132,7 +128,8 @@ class Facade_game {
 
 int main(int argc, char* argv[]) {
     srand(time(nullptr));
-    Facade_game game;
+    
+    Facade_game game(VideoMode::getDesktopMode().height);
     while (game.is_Running()) {
         game.update_game();
     }
