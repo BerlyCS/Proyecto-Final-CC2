@@ -1,6 +1,6 @@
 #include "facade.hpp"
 #include "menu.h"
-Facade_game::Facade_game(int SCREEN_SIZE) : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%7), menu(SCREEN_SIZE) {
+Facade_game::Facade_game(int SCREEN_SIZE) : window(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman"), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%7), menu(SCREEN_SIZE) {
     window.setVerticalSyncEnabled(true);
     mapa.Print();
     Game_started = false;
