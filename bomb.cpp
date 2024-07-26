@@ -40,10 +40,7 @@ void Bomb::update() {
 void Bomb::draw(RenderWindow& window, float dt) {
     frames.update(dt);
     frames.applyToSprite(sprite);
-    /* if (alive) { */
-    /* window.draw(bomb); */
     window.draw(sprite);
-    /* } */
 }
 
 Vector2f Bomb::getPosition() const {
