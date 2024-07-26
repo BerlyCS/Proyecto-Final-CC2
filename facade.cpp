@@ -30,30 +30,6 @@ void Facade_game::update_game() {
             Game_started = false;
         } 
 
-/*              if (event.type == sf::Event::KeyPressed) {
-            switch (event.key.code) {
-                case sf::Keyboard::Num1:
-                    Sound_Singleton::play_battle_1();
-                    break;
-                case sf::Keyboard::Num2:
-                    Sound_Singleton::play_battle_2();
-                    break;
-                case sf::Keyboard::Num3:
-                    Sound_Singleton::play_bombexplosion();
-                    break;
-                case sf::Keyboard::Num4:
-                    Sound_Singleton::play_bombplace();
-                    break;
-                case sf::Keyboard::Num5:
-                    Sound_Singleton::play_powerup();
-                    break;
-                case sf::Keyboard::Num6:
-                    Sound_Singleton::play_menu_theme();
-                    break;
-                default:
-                    break;
-            }
-        }*/            
     }
     if (!Game_started) {
         menu.handleEvent(window, Game_started);
