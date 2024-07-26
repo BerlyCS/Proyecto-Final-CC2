@@ -139,6 +139,7 @@ Vector2f Bomb::collision(FloatRect playerCollider, Vector2f movement){
         stayBomb = false;
         return Vector2f(0, 0);
     }
+    return Vector2f();
 }
 
 void Bomb::bombKill(FloatRect playerCollider, Mapa_2 map, bool &isAlive){
