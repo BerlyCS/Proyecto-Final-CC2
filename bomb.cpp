@@ -99,7 +99,6 @@ void Bomb::destroy(Mapa_2 &map) {
         //right tiles
         if ( m.x + i < 13  && right) {
             if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
-                //delete map.get_block_at(m.x+i, m.y);
                 map.to_tile_at(Vector2i(m.x+i,m.y ));
                 map.insertFire(Vector2i(m.x + i, m.y), 0);
                 right=false;

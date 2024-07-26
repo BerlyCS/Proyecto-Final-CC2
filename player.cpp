@@ -3,6 +3,7 @@
 #include "mapa.h"
 #include "sound.hpp"
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 
 using namespace sf;
@@ -29,7 +30,7 @@ bool Player::alive() {
     return isAlive;
 }
 
-void Player::kill() {
+void Player::kill_anim() {
     isAlive = false;
 }
 
@@ -55,7 +56,7 @@ void Player::checkCollision(Mapa_2& map, Vector2f movement){
     FloatRect playerBounds = collider.getGlobalBounds();
     for(int i=0; i<13; i++){
         for(int j=0; j<13; j++){
-            Block* block = map.get_block_at(i, j);
+            shared_ptr<Block> block = map.get_block_at(i, j);
             if(block!=nullptr){
                 if (block->IsCollidable()) {
                     FloatRect blockBounds = block->getSprite().getGlobalBounds();
