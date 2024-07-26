@@ -1,10 +1,14 @@
 #include "facade.hpp"
+#include "menu.h"
 Facade_game::Facade_game(int SCREEN_SIZE) : window(RenderWindow(sf::VideoMode(SCREEN_SIZE, SCREEN_SIZE), "Bomberman")), player(mapa, SCREEN_SIZE, SCREEN_SIZE), player2(mapa), mapa(SCREEN_SIZE, SCREEN_SIZE, rand()%7), menu(SCREEN_SIZE) {
     window.setVerticalSyncEnabled(true);
     mapa.Print();
     Game_started = false;
     Sound_Singleton::init();//agrega singleton
     Sound_Singleton::play_menu_theme();
+    
+    font.loadFromFile("font.ttf");
+
     /* cout<<"estilo: "<<mapa.get_map_style()<<endl; */
 }
 
@@ -68,6 +72,10 @@ void Facade_game::update_game() {
         player.draw(window);
     else {
         cout<<"gano jugador 2"<<endl;
+        Button p2(Vector2f(150,150), "Gano el jugador 2", font, 60, 30);
+        p2.draw(window);
+        window.display();
+
         this_thread::sleep_for(chrono::seconds(3));
         window.close();
     }
@@ -75,6 +83,9 @@ void Facade_game::update_game() {
         player2.draw(window);
     else {
         cout<<"gano jugador 1"<<endl;
+        Button p1(Vector2f(150,150), "Gano el jugador 1", font, 60, 30);
+        p1.draw(window);
+        window.display();
         this_thread::sleep_for(chrono::seconds(3));
         window.close();
     }
