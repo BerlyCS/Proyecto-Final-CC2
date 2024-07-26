@@ -60,7 +60,6 @@ void Bomb::destroy(Mapa_2 &map) {
         //up tiles
         if ( m.y - i >= 0 && up ) {
             if ( map.get_block_at(m.x, m.y - i)->IsBreakable() ) {
-                delete map.get_block_at(m.x, m.y - i);
                 map.to_tile_at(Vector2i(m.x,m.y - i));
                 up=false;
                 map.insertFire(Vector2i(m.x, m.y - i), 1);
@@ -74,7 +73,6 @@ void Bomb::destroy(Mapa_2 &map) {
         //down tiles
         if ( m.y + i < 13 && down) {
             if ( map.get_block_at(m.x, m.y + i)->IsBreakable() ) {
-                delete map.get_block_at(m.x, m.y + i);
                 map.to_tile_at(Vector2i(m.x,m.y + i));
                 map.insertFire(Vector2i(m.x, m.y + i), 1);
                 down=false;
@@ -88,7 +86,6 @@ void Bomb::destroy(Mapa_2 &map) {
         //left tiles
         if ( m.x - i > 0 && left ) {
             if ( map.get_block_at(m.x - i, m.y)->IsBreakable() ) {
-                delete map.get_block_at(m.x - i, m.y);
                 map.to_tile_at(Vector2i(m.x - i,m.y));
                 map.insertFire(Vector2i(m.x - i, m.y), 0);
                 left=false;
@@ -102,7 +99,7 @@ void Bomb::destroy(Mapa_2 &map) {
         //right tiles
         if ( m.x + i < 13  && right) {
             if ( map.get_block_at(m.x + i, m.y)->IsBreakable() ) {
-                delete map.get_block_at(m.x+i, m.y);
+                //delete map.get_block_at(m.x+i, m.y);
                 map.to_tile_at(Vector2i(m.x+i,m.y ));
                 map.insertFire(Vector2i(m.x + i, m.y), 0);
                 right=false;
